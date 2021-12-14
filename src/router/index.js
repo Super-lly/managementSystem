@@ -7,8 +7,13 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: ()=>import('../views/Home.vue')
+    name: 'Main',
+    component: ()=>import('../views/Main.vue'),
+    children:[{
+      path:'/',
+      name:'Home',
+      component:()=>import('../views/Home/Home.vue')
+    }]
   }
 ]
 

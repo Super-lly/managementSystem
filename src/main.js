@@ -3,7 +3,7 @@ import App from './App.vue'
 import './registerServiceWorker'
 import router from './router'
 import store from './store'
-import { Container,Aside,Header,Main,Menu,MenuItem,MenuItemGroup,Submenu } from 'element-ui';
+import { Container,Aside,Header,Main,Menu,MenuItem,MenuItemGroup,Submenu,Button,Dropdown,DropdownMenu,DropdownItem,Row,Col,Card } from 'element-ui';
 
 Vue.config.productionTip = false
 
@@ -15,6 +15,13 @@ Vue.use(Menu);
 Vue.use(MenuItem);
 Vue.use(MenuItemGroup);
 Vue.use(Submenu);
+Vue.use(Button);
+Vue.use(Dropdown);
+Vue.use(DropdownMenu);
+Vue.use(DropdownItem);
+Vue.use(Row);
+Vue.use(Col);
+Vue.use(Card);
 
 new Vue({
   router,

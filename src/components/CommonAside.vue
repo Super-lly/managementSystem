@@ -1,8 +1,6 @@
 <template>
   <el-menu
     class="el-menu-vertical-demo"
-    @open="handleOpen"
-    @close="handleClose"
     :collapse="isCollapse"
     background-color="#545c64"
     text-color="#fff"
@@ -13,6 +11,7 @@
       :index="item.path"
       v-for="item in noChildren"
       :key="item.path"
+      @click="clickMenu(item)"
     >
       <i :class="'el-icon-' + item.icon"></i>
       <span slot="title">{{ item.label }}</span>
@@ -24,7 +23,7 @@
         <span slot="title">{{ item.label }}</span>
       </template>
       <el-menu-item-group>
-        <el-menu-item :index="v.path" v-for="v in item.children" :key="v.path">
+        <el-menu-item :index="v.path" v-for="v in item.children" :key="v.path" @click="clickMenu(item)">
           <i :class="'el-icon-' + v.icon"></i>
           <span slot="title">{{ v.label }}</span>
         </el-menu-item>
@@ -37,7 +36,6 @@
 export default {
   data() {
     return {
-      isCollapse: false,
       menu: [
         {
           path: "/",
@@ -84,12 +82,9 @@ export default {
     };
   },
   methods: {
-    handleOpen(key, keyPath) {
-      console.log(key, keyPath);
-    },
-    handleClose(key, keyPath) {
-      console.log(key, keyPath);
-    },
+    clickMenu(item){
+      this.$router.push({name:item.name})
+    }
   },
   computed: {
     noChildren() {
@@ -98,13 +93,25 @@ export default {
     hasChildren() {
       return this.menu.filter((item) => item.children);
     },
+    isCollapse(){
+      return this.$store.state.isCollapse
+    }
   },
 };
 </script>
 
 <style>
+.el-menu{
+  height: 100%;
+}
+.el-menu h3{
+  color: #fff;
+}
 .el-menu-vertical-demo:not(.el-menu--collapse) {
   width: 200px;
   min-height: 400px;
+}
+h3{
+  text-align: center;
 }
 </style>
