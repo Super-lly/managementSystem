@@ -47,7 +47,9 @@
           </div>
         </el-card>
       </div>
-      <el-card shadow="hover" style="height:280px"></el-card>
+      <el-card shadow="hover" style="height:280px">
+        <div ref="echart" style="height:280px"></div>
+      </el-card>
       <div class="graph">
         <el-card shadow="hover" style="height:280px"></el-card>
         <el-card shadow="hover" style="height:280px"></el-card>
@@ -57,42 +59,14 @@
 </template>
 
 <script>
+import { getHome } from '../../network/data'
+import * as echarts from 'echarts'
+
 export default {
   name: "Home",
   data() {
     return {
-      tableData: [
-        {
-          name: 1,
-          todayBuy: 100,
-          mouthBuy: 300,
-          totalBuy: 800,
-        },
-        {
-          name: 2,
-          todayBuy: 100,
-          mouthBuy: 300,
-          totalBuy: 800,
-        },
-        {
-          name: 3,
-          todayBuy: 100,
-          mouthBuy: 300,
-          totalBuy: 800,
-        },
-        {
-          name: 4,
-          todayBuy: 100,
-          mouthBuy: 300,
-          totalBuy: 800,
-        },
-        {
-          name: 5,
-          todayBuy: 100,
-          mouthBuy: 300,
-          totalBuy: 800,
-        },
-      ],
+      tableData:[],
       tableLabel: {
         name: "数字",
         todayBuy: "今日购买",
@@ -137,10 +111,72 @@ export default {
           color: "#5ab1ef",
         },
       ],
+      echartsData:{
+        order:{
+          legend:{
+            // 图例文字颜色
+            textStyle:{
+              color:'#333'
+            }
+          },
+          grid:{
+            left:"20%"
+          },
+          // 提示框
+          tooltip:{
+            trigger:'axis'
+          },
+          xAxis:{
+            type:'category',
+            data:[],
+            axisLine:{
+              lineStyle:{
+                color:'#17b3a3'
+              }
+            },
+            axisLabel:{
+              interval:0,
+              color:'#333'
+            }
+          },
+          yAxis:[
+            {
+              type:'value',
+              axisLine:{
+                lineStyle:{
+                  color:'#17b3a3'
+                }
+              }
+            }
+          ],
+          color:['#2ec7c9','#b6a2de','#5ab1ef','#ffb980','#d87a80','#8d98b3'],
+          series:[]
+        }
+      }
     };
   },
+  methods:{
+    getTableData(){
+      getHome().then(res=>{
+        console.log(res);
+      this.tableData = res.data.tableData
+      const order = res.data.orderData
+      this.echartsData.order.xAxis.data = order.date
+      let keyArray = Object.keys(order.data[0])
+      keyArray.forEach(k=>{
+        this.echartsData.order.series.push({
+          type:'line',
+          name:k,
+          data:order.data.map(item=>item[k])
+        })
+      })
+      const myEchartsData = echarts.init(this.$refs.echart)
+      myEchartsData.setOption(this.echartsData.order)
+    })
+    }
+  },
   mounted(){
-    
+    this.getTableData()
   }
 };
 </script>
@@ -182,7 +218,7 @@ export default {
 .el-card {
   margin-bottom: 20px;
 }
-/deep/.num .el-card__body {
+.num /deep/ .el-card__body {
   display: flex;
   align-items: center;
   justify-content: space-between;

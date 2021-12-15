@@ -28,6 +28,8 @@ Vue.use(Card);
 Vue.use(Table);
 Vue.use(TableColumn);
 
+
+if(process.env.NODE_ENV === 'development') require('@/network/mock')
 new Vue({
   router,
   store,
