@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3011984 */
-  src: url('//at.alicdn.com/t/font_3011984_avfznxlxh59.woff2?t=1639446327000') format('woff2'),
-       url('//at.alicdn.com/t/font_3011984_avfznxlxh59.woff?t=1639446327000') format('woff'),
-       url('//at.alicdn.com/t/font_3011984_avfznxlxh59.ttf?t=1639446327000') format('truetype');
+  src: url('//at.alicdn.com/t/font_3011984_we5skjydh7.woff2?t=1646724186251') format('woff2'),
+       url('//at.alicdn.com/t/font_3011984_we5skjydh7.woff?t=1646724186251') format('woff'),
+       url('//at.alicdn.com/t/font_3011984_we5skjydh7.ttf?t=1646724186251') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,30 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-roots:before {
+  content: "\e618";
+}
+
+.icon-jiedianguanli:before {
+  content: "\eb64";
+}
+
+.icon-icon-eye-open:before {
+  content: "\e60c";
+}
+
+.icon-icon-eye-close:before {
+  content: "\e60d";
+}
+
+.icon-chilun:before {
+  content: "\e63f";
+}
+
+.icon-yonghuxinxi-:before {
+  content: "\e62c";
 }
 
 .icon-menu:before {

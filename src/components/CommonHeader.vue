@@ -1,15 +1,15 @@
 <template>
   <header>
     <div class="l_content">
-      <el-button plain size="mini" icon="el-icon-menu" @click="changeMenu()"></el-button>
-      <h3 style="color: #fff">首页</h3>
+      <el-button plain size="mini" icon="el-icon-menu" @click="changeMenu"></el-button>
+      <h3 style="color: #fff;cursor:pointer" @click="toHome">首页</h3>
     </div>
     <div class="r_content">
       <el-dropdown trigger="click">
-        <img src="../assets/images/user.png" alt="user" />
+        <img style="cursor:pointer" :src="userinfo.user_pic ? userinfo.user_pic: imgUrl" alt="userpic" />
         <el-dropdown-menu>
-          <el-dropdown-item>个人中心</el-dropdown-item>
-          <el-dropdown-item>退出</el-dropdown-item>
+          <el-dropdown-item @click.native="mySpace">个人中心</el-dropdown-item>
+          <el-dropdown-item @click.native="logOut">退出</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
@@ -17,11 +17,32 @@
 </template>
 
 <script>
+import imgUrl from '@/assets/images/defaultPic.png'
+
 export default {
   name:'CommonHeader',
+  data(){
+    return {
+      imgUrl
+    }
+  },
+  props:{
+    userinfo:{
+      type:Object,
+    }
+  },
   methods:{
     changeMenu(){
       this.$store.commit('collapseMenu')
+    },
+    toHome(){
+      this.$router.push('/main')
+    },
+    logOut(){
+      this.$router.replace('/')
+    },
+    mySpace(){
+      this.$router.push('/seeuserinfo')
     }
   }
 }

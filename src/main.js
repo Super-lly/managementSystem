@@ -5,7 +5,7 @@ import router from './router'
 import store from './store'
 import {
   Container, Aside, Header, Main, Menu, MenuItem, MenuItemGroup, Submenu, Button, Dropdown, DropdownMenu,
-  DropdownItem, Row, Col, Card, Table, TableColumn
+  DropdownItem, Row, Col, Card, Table, TableColumn, Input, MessageBox, Message, Drawer, Form, FormItem
 } from 'element-ui';
 
 Vue.config.productionTip = false
@@ -27,7 +27,17 @@ Vue.use(Col);
 Vue.use(Card);
 Vue.use(Table);
 Vue.use(TableColumn);
+Vue.use(Input);
+Vue.use(Drawer);
+Vue.use(Form);
+Vue.use(FormItem);
 
+Vue.component(MessageBox.name, MessageBox)
+Vue.component(Message.name, Message)
+
+// 在Vue实例上挂载$message和$confirm
+Vue.prototype.$message = Message
+Vue.prototype.$confirm = MessageBox.confirm
 
 if(process.env.NODE_ENV === 'development') require('@/network/mock')
 new Vue({

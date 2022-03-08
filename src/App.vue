@@ -5,9 +5,11 @@
 </template>
 
 <style>
+@import './assets/iconfont.css';
 #app{
   margin: 0;
   padding: 0;
-  height: 100vh;
+  height: 98vh;
+  min-width: 1190px;
 }
 </style>
