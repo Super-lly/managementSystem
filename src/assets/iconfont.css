@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3011984 */
-  src: url('//at.alicdn.com/t/font_3011984_we5skjydh7.woff2?t=1646724186251') format('woff2'),
-       url('//at.alicdn.com/t/font_3011984_we5skjydh7.woff?t=1646724186251') format('woff'),
-       url('//at.alicdn.com/t/font_3011984_we5skjydh7.ttf?t=1646724186251') format('truetype');
+  src: url('//at.alicdn.com/t/font_3011984_uiwwu43l5j.woff2?t=1646789867059') format('woff2'),
+       url('//at.alicdn.com/t/font_3011984_uiwwu43l5j.woff?t=1646789867059') format('woff'),
+       url('//at.alicdn.com/t/font_3011984_uiwwu43l5j.ttf?t=1646789867059') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,10 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-3dtouchshangpinliebiaotuijian:before {
+  content: "\e608";
 }
 
 .icon-roots:before {

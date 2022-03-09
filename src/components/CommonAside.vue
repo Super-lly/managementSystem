@@ -90,11 +90,19 @@ export default {
           ],
         },
         {
-          path: "/mall",
           name: "mall",
           label: "商品管理",
           icon: "video-play",
           url: "MallManage/MallManage",
+          children:[
+            {
+              path: "/goodsinfo",
+              name: "goodsinfo",
+              icon: "3dtouchshangpinliebiaotuijian",
+              label: "商品列表",
+              url: "/goodsinfo",
+            },
+          ]
         },
       ],
     };

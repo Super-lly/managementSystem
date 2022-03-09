@@ -6,6 +6,9 @@
           :src="userinfo.user_pic ? userinfo.user_pic : imgUrl"
           alt="userpic"
         />
+        <input type="file" ref="file" />
+        <el-button @click="changePic" type="text">修改头像</el-button>
+        <!-- 基础信息修改 -->
         <div class="changeinfo">
           <p>信息修改</p>
           <span>昵 称：</span>
@@ -19,7 +22,7 @@
             @change="changeName(nickname)"
           >
           </el-input>
-          <el-button type="text" @click="updatename">点击修改</el-button>
+          <el-button type="text" @click="updatename" style="margin-left:10px">点击修改</el-button>
           <br />
           <span>邮 箱：</span>
           <el-input
@@ -32,9 +35,10 @@
             @change="changeEmail(email)"
           >
           </el-input>
-          <el-button type="text" @click="updateemail">点击修改</el-button>
+          <el-button type="text" @click="updateemail" style="margin-left:10px">点击修改</el-button>
         </div>
         <hr style="margin: 15px 0" />
+        <!-- 密码修改 -->
         <div class="changepwd">
           <p>密码修改</p>
           <span>请输入原密码：</span>
@@ -45,7 +49,9 @@
             :value="password"
           ></el-input>
           <span
-            :class="`iconfont icon-${icon ? 'icon-eye-open' : 'icon-eye-close'}`"
+            :class="`iconfont icon-${
+              icon ? 'icon-eye-open' : 'icon-eye-close'
+            }`"
             @click="changePwd"
           ></span>
           <br />
@@ -57,7 +63,9 @@
             :value="newpassword"
           ></el-input>
           <span
-            :class="`iconfont icon-${newIcon ? 'icon-eye-open' : 'icon-eye-close'}`"
+            :class="`iconfont icon-${
+              newIcon ? 'icon-eye-open' : 'icon-eye-close'
+            }`"
             @click="changeNpwd"
           ></span>
           <br />
@@ -69,13 +77,16 @@
             :value="secpassword"
           ></el-input>
           <span
-            :class="`iconfont icon-${secIcon ? 'icon-eye-open' : 'icon-eye-close'}`"
+            :class="`iconfont icon-${
+              secIcon ? 'icon-eye-open' : 'icon-eye-close'
+            }`"
             @click="changeSpwd"
           ></span>
           <br />
           <el-button
             style="margin-left: 40%; margin-top: 10px"
             @click="updatePwd"
+             type="text"
             >确认修改</el-button
           >
         </div>
@@ -196,24 +207,27 @@ export default {
     },
     // 修改密码
     updatePwd() {
-      if (this.password === "" || this.newpassword === "" || this.secpassword === "") {
-        this.$message({
-          type:'error',
-          message:"请输入密码或新密码"
-        });
-      } else if (
-        this.password === this.newpassword && this.password === this.secpassword
+      if (
+        this.password === "" ||
+        this.newpassword === "" ||
+        this.secpassword === ""
       ) {
         this.$message({
-          type:'error',
-          message:"新密码不能和原密码相同"
+          type: "error",
+          message: "请输入密码或新密码",
         });
       } else if (
-        this.newpassword != this.secpassword
+        this.password === this.newpassword &&
+        this.password === this.secpassword
       ) {
         this.$message({
-          type:'error',
-          message:"两次输入密码不一致"
+          type: "error",
+          message: "新密码不能和原密码相同",
+        });
+      } else if (this.newpassword != this.secpassword) {
+        this.$message({
+          type: "error",
+          message: "两次输入密码不一致",
         });
       } else {
         this.$confirm("是否修改密码?", "提示", {
@@ -240,9 +254,9 @@ export default {
                   type: "success",
                   message: "修改成功!",
                 });
-                this.password = ''
-                this.newpassword = ''
-                this.secpassword = ''
+                this.password = "";
+                this.newpassword = "";
+                this.secpassword = "";
               } else {
                 this.$message({
                   type: "error",
@@ -269,6 +283,52 @@ export default {
     changeSpwd() {
       this.secIcon = !this.secIcon;
     },
+    // 头像修改
+    changePic() {
+      // 二次确认
+      this.$confirm("确认修改?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          const id = this.id;
+          // console.log(this.$refs.file.files[0]);
+          let file = this.$refs.file.files[0];
+          let maxSize = 300 * 1024;
+          // 将图片转为base64格式
+          const render = new FileReader();
+          render.readAsDataURL(file);
+          render.onload = () => {
+            if (file.size >= maxSize) {
+              this.$message.error("上传图片不能超过300kb");
+            } else {
+              let user_pic = render.result;
+              // 提交图片
+              updatePicRequest({
+                url: "/updatepic",
+                method: "post",
+                data: {
+                  id,
+                  user_pic,
+                },
+                headers: {
+                  Authorization: this.tarr1 + " " + this.tarr2,
+                },
+              }).then((res) => {
+                if(res.status === 0){
+                  this.userinfo.user_pic = user_pic
+                  sessionStorage.setItem('userinfo',JSON.stringify(this.userinfo))
+                  this.$message.success(res.message + '，若发现修改没变化请尝试刷新或稍后再试')
+                } else{
+                  this.$message.error(res.message)
+                }
+              });
+            }
+          };
+        })
+        .catch(() => {});
+    },
   },
 };
 </script>
@@ -291,7 +351,7 @@ export default {
 .el-input {
   width: 50vw;
   margin-top: 10px;
-  margin-left: 5vw;
+  margin-left: 3vw;
   min-width: 643px;
   max-width: 768px;
 }

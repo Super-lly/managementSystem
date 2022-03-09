@@ -56,7 +56,7 @@ export default {
         Authorization: this.tarr1 + " " + this.tarr2,
       },
     }).then((res) => {
-      this.userinfo = res.data;
+      this.userinfo = res.data
       this.nickname = res.data.nickname ? res.data.nickname : "null";
       this.email = res.data.email ? res.data.email : "null";
       this.nickname_c = this.nickname;
@@ -71,7 +71,7 @@ export default {
       }
       console.log(this.userinfo);
     });
-  }
+  },
 };
 </script>
 
