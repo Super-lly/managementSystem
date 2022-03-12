@@ -1,12 +1,34 @@
 <template>
   <div class="manageuser">
-    <div class="addUser">
-      <el-button style="margin-top: 15px" @click="addUsers" v-if="visiable">增加用户</el-button>
-      <p style="margin-top: 15px;color:rgb(180, 182, 182)" v-else>您没有操作权限</p>
+    <div class="usertools">
+      <div class="addUser">
+        <el-button style="margin-top: 15px" @click="addUsers" v-if="visiable"
+          >增加用户</el-button
+        >
+        <p style="margin-top: 15px; color: rgb(180, 182, 182)" v-else>
+          您没有操作权限
+        </p>
+      </div>
+      <div class="serchuser">
+        <el-input
+          placeholder="请输入内容"
+          v-model="input"
+          style="max-width: 300px"
+          clearable
+        ></el-input>
+        <el-button @click="searchuser">查询</el-button>
+        <el-button type="warning" @click="reset">重置</el-button>
+      </div>
     </div>
+    <!-- 表格 -->
     <div class="tableCard">
       <el-card shadow="hover" style="height: 65vh">
-        <el-table :data="tableData" :style="`${visiable ? 'width:70%;': 'width:59%;'}`" max-height="400">
+        <el-table
+          v-loading="loading"
+          :data="tableData"
+          :style="`${visiable ? 'width:70%;' : 'width:59%;'}`"
+          max-height="400"
+        >
           <el-table-column fixed prop="username" label="用户名" width="200">
           </el-table-column>
           <el-table-column prop="nickname" label="昵称" width="170">
@@ -15,6 +37,7 @@
           </el-table-column>
           <el-table-column prop="userroot" label="权限" width="150">
           </el-table-column>
+          <!-- 操作 -->
           <el-table-column
             fixed="right"
             label="操作"
@@ -95,7 +118,7 @@
 </template>
 
 <script>
-import { getAllInfo, removeuser, adduser } from "../../network/userInfo";
+import { getAllInfo, removeuser, adduser, searchuser } from "../../network/userInfo";
 
 export default {
   data() {
@@ -105,6 +128,7 @@ export default {
       tokenStr: sessionStorage.getItem("token"),
       id: sessionStorage.getItem("id"),
       tableData: [],
+      tabledata: [],
       visiable: true,
       dialog: false,
       loading: false,
@@ -114,17 +138,19 @@ export default {
         email: "",
         password: "",
       },
+      input: "",
     };
   },
   created() {
     this.tarr1 = this.tokenStr.split("").slice(0, 6).join("");
     this.tarr2 = this.tokenStr.split("").slice(6, this.tokenStr.length).join("");
+    this.loading = true;
+    let userinfo = JSON.parse(sessionStorage.getItem("userinfo"));
     // 判断显隐
-    let userinfo = JSON.parse(sessionStorage.getItem("userinfo"))
-    if(userinfo.userroot === 'a'){
-      this.visiable = true
+    if (userinfo.userroot === "a") {
+      this.visiable = true;
     } else {
-      this.visiable = false
+      this.visiable = false;
     }
     // 获取全部用户信息
     getAllInfo({
@@ -146,8 +172,9 @@ export default {
             v.userroot = "其他用户";
           }
         });
-        console.log(this.tableData);
-        console.log(this.visiable);
+        setTimeout(() => {
+          this.loading = false;
+        }, 1500);
       }
     });
   },
@@ -218,7 +245,7 @@ export default {
           if (res.status === 0) {
             this.$message.success(res.message);
             this.loading = false;
-            this.dialog = false
+            this.dialog = false;
             this.form = {
               username: "",
               nickname: "",
@@ -245,6 +272,50 @@ export default {
       //   password:''
       // }
     },
+    // 查询用户
+    searchuser() {
+      console.log(this.input);
+      this.loading = true;
+      let id = "";
+      this.tableData.map((v) => {
+        if (this.input === v.username) {
+          return (id = v.id);
+        }
+      });
+      if (id === "") {
+        this.$message.error("该用户不存在");
+      } else {
+        searchuser({
+          url: "/searchuser",
+          method: "post",
+          data: { id },
+          headers: {
+            Authorization: this.tarr1 + " " + this.tarr2,
+          },
+        }).then((res) => {
+          console.log(res);
+          if (res.status === 0) {
+            this.tabledata = this.tableData;
+            setTimeout(() => {
+              this.tableData = res.data;
+              this.loading = false;
+            }, 1000);
+          } else {
+            this.$message.error(res.message);
+            setTimeout(() => {
+              this.loading = false;
+            }, 1000);
+          }
+        });
+      }
+    },
+    reset() {
+      this.loading = true;
+      setTimeout(() => {
+        this.tableData = this.tabledata;
+        this.loading = false;
+      }, 1500);
+    },
   },
 };
 </script>
@@ -257,5 +328,16 @@ export default {
 .el-table {
   margin: 0 auto;
   margin-top: 15px;
+}
+.usertools {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+.serchuser {
+  display: flex;
+  width: 40%;
+  justify-content: space-around;
+  align-items: center;
 }
 </style>

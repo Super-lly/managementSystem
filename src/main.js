@@ -5,7 +5,8 @@ import router from './router'
 import store from './store'
 import {
   Container, Aside, Header, Main, Menu, MenuItem, MenuItemGroup, Submenu, Button, Dropdown, DropdownMenu,
-  DropdownItem, Row, Col, Card, Table, TableColumn, Input, MessageBox, Message, Drawer, Form, FormItem, Select, Option
+  DropdownItem, Row, Col, Card, Table, TableColumn, Input, MessageBox, Message, Drawer, Form, FormItem, Select,
+  Option, Loading
 } from 'element-ui';
 
 Vue.config.productionTip = false
@@ -33,6 +34,7 @@ Vue.use(Form);
 Vue.use(FormItem);
 Vue.use(Select);
 Vue.use(Option);
+Vue.use(Loading.directive);
 
 Vue.component(MessageBox.name, MessageBox)
 Vue.component(Message.name, Message)
