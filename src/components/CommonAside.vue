@@ -80,13 +80,13 @@ export default {
               label: "管理用户",
               url: "/manageuser",
             },
-            {
-              path: "/changeuserroot",
-              name: "changeuserroot",
-              icon: "roots",
-              label: "更改权限",
-              url: "/changeuserroot",
-            },
+            // {
+            //   path: "/changeuserroot",
+            //   name: "changeuserroot",
+            //   icon: "roots",
+            //   label: "更改权限",
+            //   url: "/changeuserroot",
+            // },
           ],
         },
         {

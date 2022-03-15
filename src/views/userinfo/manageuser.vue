@@ -2,16 +2,16 @@
   <div class="manageuser">
     <div class="usertools">
       <div class="addUser">
-        <el-button style="margin-top: 15px" @click="addUsers" v-if="visiable"
+        <el-button style="margin-top: 15px" @click="addUsers"
           >增加用户</el-button
         >
-        <p style="margin-top: 15px; color: rgb(180, 182, 182)" v-else>
+        <!-- <p style="margin-top: 15px; color: rgb(180, 182, 182)" v-else>
           您没有操作权限
-        </p>
+        </p> -->
       </div>
       <div class="serchuser">
         <el-input
-          placeholder="请输入内容"
+          placeholder="请输入用户名"
           v-model="input"
           style="max-width: 300px"
           clearable
@@ -26,7 +26,7 @@
         <el-table
           v-loading="loading"
           :data="tableData"
-          :style="`${visiable ? 'width:70%;' : 'width:59%;'}`"
+          style="width: 70%"
           max-height="400"
         >
           <el-table-column fixed prop="username" label="用户名" width="200">
@@ -35,15 +35,21 @@
           </el-table-column>
           <el-table-column prop="email" label="邮箱" width="200">
           </el-table-column>
-          <el-table-column prop="userroot" label="权限" width="150">
+          <el-table-column prop="rootname" label="权限" width="150">
+            <template slot-scope="scope">
+              <el-select v-model="scope.row.userroot" placeholder="请选择">
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                >
+                </el-option>
+              </el-select>
+            </template>
           </el-table-column>
           <!-- 操作 -->
-          <el-table-column
-            fixed="right"
-            label="操作"
-            width="120"
-            v-if="visiable"
-          >
+          <el-table-column fixed="right" label="操作" width="120">
             <template slot-scope="scope">
               <el-button
                 @click.native.prevent="
@@ -54,8 +60,17 @@
               >
                 移除
               </el-button>
+              <span style="color: blue"> | </span>
+              <el-button
+                @click.native.prevent="
+                  changeRoot(scope.row, scope.$index, tableData)
+                "
+                type="text"
+                size="small"
+              >
+                修改
+              </el-button>
             </template>
-            -->
           </el-table-column>
         </el-table>
       </el-card>
@@ -118,7 +133,7 @@
 </template>
 
 <script>
-import { getAllInfo, removeuser, adduser, searchuser } from "../../network/userInfo";
+import { getAllInfo, removeuser, adduser, searchuser, changeRoot } from "../../network/userInfo";
 
 export default {
   data() {
@@ -129,7 +144,8 @@ export default {
       id: sessionStorage.getItem("id"),
       tableData: [],
       tabledata: [],
-      visiable: true,
+      userinfo: {},
+      // visiable: true,
       dialog: false,
       loading: false,
       form: {
@@ -139,6 +155,20 @@ export default {
         password: "",
       },
       input: "",
+      options: [
+        {
+          value: "a",
+          label: "超级管理员",
+        },
+        {
+          value: "b",
+          label: "普通用户",
+        },
+        {
+          value: "c",
+          label: "其他用户",
+        },
+      ],
     };
   },
   created() {
@@ -146,12 +176,13 @@ export default {
     this.tarr2 = this.tokenStr.split("").slice(6, this.tokenStr.length).join("");
     this.loading = true;
     let userinfo = JSON.parse(sessionStorage.getItem("userinfo"));
+    this.userinfo = userinfo;
     // 判断显隐
-    if (userinfo.userroot === "a") {
-      this.visiable = true;
-    } else {
-      this.visiable = false;
-    }
+    // if (userinfo.userroot === "a") {
+    //   this.visiable = true;
+    // } else {
+    //   this.visiable = false;
+    // }
     // 获取全部用户信息
     getAllInfo({
       url: "/getallinfo",
@@ -165,16 +196,17 @@ export default {
         this.tableData = res.data;
         this.tableData.map((v) => {
           if (v.userroot === "a") {
-            v.userroot = "超级管理员";
+            v.rootname = "超级管理员";
           } else if (v.userroot === "b") {
-            v.userroot = "普通用户";
+            v.rootname = "普通用户";
           } else if (v.userroot === "c") {
-            v.userroot = "其他用户";
+            v.rootname = "其他用户";
           }
         });
         setTimeout(() => {
           this.loading = false;
         }, 1500);
+        console.log(this.tableData);
       }
     });
   },
@@ -183,25 +215,75 @@ export default {
     deleteRow(val, index, rows) {
       console.log(val, index, rows);
       const url = "/removeuser";
-      removeuser({
-        url,
-        method: "post",
-        data: {
-          id: val.id,
-        },
-        headers: {
-          Authorization: this.tarr1 + " " + this.tarr2,
-        },
-      }).then((res) => {
-        console.log(res);
-        if (res.status === 0) {
-          if (this.tableData.length >= 1) {
-            this.tableData.splice(index, 1);
-          } else {
-            this.$message.error("最少保留一条数据");
+      if (this.userinfo.userroot === "a") {
+        removeuser({
+          url,
+          method: "post",
+          data: {
+            id: val.id,
+          },
+          headers: {
+            Authorization: this.tarr1 + " " + this.tarr2,
+          },
+        }).then((res) => {
+          console.log(res);
+          if (res.status === 0) {
+            if (this.tableData.length >= 1) {
+              this.tableData.splice(index, 1);
+            } else {
+              this.$message.error("最少保留一条数据");
+            }
           }
-        }
-      });
+        });
+      } else {
+        this.$message.error("您没有操作权限");
+      }
+    },
+    // 修改权限
+    changeRoot(val, index, rows) {
+      console.log(val);
+      const data = {
+        id: val.id,
+        userroot: val.userroot,
+      };
+      if (this.userinfo.userroot === "a") {
+        this.$confirm("是否确认修改指定用户", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        })
+          .then(() => {
+            changeRoot({
+              url: "/changeroot",
+              method: "post",
+              data: data,
+              headers: {
+                Authorization: this.tarr1 + " " + this.tarr2,
+              },
+            }).then((res) => {
+              console.log(res);
+              if (res.status === 0) {
+                this.$message.success(res.message);
+                this.tableData.forEach((v) => {
+                  if (v.id === val.id) {
+                    v.userroot = val.userroot;
+                  }
+                });
+                console.log(this.tableData);
+              } else {
+                this.$message.error(res.message);
+              }
+            });
+          })
+          .catch(() => {
+            this.$message({
+              type: "info",
+              message: "已取消修改",
+            });
+          });
+      } else {
+        this.$message.error("您没有足够权限");
+      }
     },
     addUsers() {
       this.dialog = true;
@@ -284,6 +366,7 @@ export default {
       });
       if (id === "") {
         this.$message.error("该用户不存在");
+        this.loading = false;
       } else {
         searchuser({
           url: "/searchuser",
@@ -309,6 +392,7 @@ export default {
         });
       }
     },
+    // 重置
     reset() {
       this.loading = true;
       setTimeout(() => {
