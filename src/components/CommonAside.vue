@@ -102,6 +102,13 @@ export default {
               label: "商品列表",
               url: "/goodsinfo",
             },
+            {
+              path: "/managegoods",
+              name: "managegoods",
+              icon: "shangpinguanli",
+              label: "商品管理",
+              url: "/managegoods",
+            },
           ]
         },
       ],

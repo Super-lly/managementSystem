@@ -6,7 +6,7 @@ import store from './store'
 import {
   Container, Aside, Header, Main, Menu, MenuItem, MenuItemGroup, Submenu, Button, Dropdown, DropdownMenu,
   DropdownItem, Row, Col, Card, Table, TableColumn, Input, MessageBox, Message, Drawer, Form, FormItem, Select,
-  Option, Loading, Pagination
+  Option, Loading, Pagination, Upload, Dialog
 } from 'element-ui';
 
 Vue.config.productionTip = false
@@ -36,6 +36,8 @@ Vue.use(Select);
 Vue.use(Option);
 Vue.use(Loading.directive);
 Vue.use(Pagination)
+Vue.use(Upload)
+Vue.use(Dialog)
 
 Vue.component(MessageBox.name, MessageBox)
 Vue.component(Message.name, Message)
@@ -44,7 +46,7 @@ Vue.component(Message.name, Message)
 Vue.prototype.$message = Message
 Vue.prototype.$confirm = MessageBox.confirm
 
-if(process.env.NODE_ENV === 'development') require('@/network/mock')
+if (process.env.NODE_ENV === 'development') require('@/network/mock')
 new Vue({
   router,
   store,
