@@ -77,7 +77,7 @@
           style="margin-left:43%;margin-top:15px"
           layout="prev, pager, next"
           :page-size="10"
-          @current-change="test"
+          @current-change="changePage"
           :total="count">
         </el-pagination>
       </el-card>
@@ -149,8 +149,8 @@ export default {
       tarr2: "",
       tokenStr: sessionStorage.getItem("token"),
       id: sessionStorage.getItem("id"),
-      tableData: [],
-      tabledata: [],
+      tableData: [],  //表格渲染数据
+      tabledata: [],  //临时表格数据
       userinfo: {},
       // visiable: true,
       dialog: false,
@@ -375,20 +375,21 @@ export default {
     searchuser() {
       console.log(this.input);
       this.loading = true;
-      let id = "";
-      this.tableData.map((v) => {
-        if (this.input === v.username) {
-          return (id = v.id);
-        }
-      });
-      if (id === "") {
-        this.$message.error("该用户不存在");
-        this.loading = false;
-      } else {
+      const username = this.input
+      // let id = "";
+      // this.tableData.map((v) => {
+      //   if (this.input === v.username) {
+      //     return (id = v.id);
+      //   }
+      // });
+      // if (id === "") {
+      //   this.$message.error("该用户不存在");
+      //   this.loading = false;
+      // } else {
         searchuser({
           url: "/searchuser",
           method: "post",
-          data: { id },
+          data: { username },
           headers: {
             Authorization: this.tarr1 + " " + this.tarr2,
           },
@@ -407,7 +408,7 @@ export default {
             }, 1000);
           }
         });
-      }
+      // }
     },
     // 重置
     reset() {
@@ -418,7 +419,7 @@ export default {
       }, 1500);
     },
     // 翻页
-    test(val){
+    changePage(val){
       console.log(1212312321,val);
       let data = {
         pageNum : val,
