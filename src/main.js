@@ -6,7 +6,7 @@ import store from './store'
 import {
   Container, Aside, Header, Main, Menu, MenuItem, MenuItemGroup, Submenu, Button, Dropdown, DropdownMenu,
   DropdownItem, Row, Col, Card, Table, TableColumn, Input, MessageBox, Message, Drawer, Form, FormItem, Select,
-  Option, Loading
+  Option, Loading, Pagination
 } from 'element-ui';
 
 Vue.config.productionTip = false
@@ -35,6 +35,7 @@ Vue.use(FormItem);
 Vue.use(Select);
 Vue.use(Option);
 Vue.use(Loading.directive);
+Vue.use(Pagination)
 
 Vue.component(MessageBox.name, MessageBox)
 Vue.component(Message.name, Message)

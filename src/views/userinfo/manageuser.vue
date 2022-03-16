@@ -22,7 +22,7 @@
     </div>
     <!-- 表格 -->
     <div class="tableCard">
-      <el-card shadow="hover" style="height: 65vh">
+      <el-card shadow="hover" style="height: 75vh">
         <el-table
           v-loading="loading"
           :data="tableData"
@@ -73,6 +73,13 @@
             </template>
           </el-table-column>
         </el-table>
+        <el-pagination
+          style="margin-left:43%;margin-top:15px"
+          layout="prev, pager, next"
+          :page-size="10"
+          @current-change="test"
+          :total="count">
+        </el-pagination>
       </el-card>
     </div>
     <!-- 新增弹窗 -->
@@ -133,7 +140,7 @@
 </template>
 
 <script>
-import { getAllInfo, removeuser, adduser, searchuser, changeRoot } from "../../network/userInfo";
+import { getAllInfo, removeuser, adduser, searchuser, changeRoot, getPageInfo } from "../../network/userInfo";
 
 export default {
   data() {
@@ -155,6 +162,7 @@ export default {
         password: "",
       },
       input: "",
+      count:0,
       options: [
         {
           value: "a",
@@ -193,7 +201,7 @@ export default {
     }).then((res) => {
       console.log(res);
       if (res.status === 0) {
-        this.tableData = res.data;
+        this.tableData = res.data.slice(0,10);
         this.tableData.map((v) => {
           if (v.userroot === "a") {
             v.rootname = "超级管理员";
@@ -203,6 +211,7 @@ export default {
             v.rootname = "其他用户";
           }
         });
+        this.count = res.count
         setTimeout(() => {
           this.loading = false;
         }, 1500);
@@ -328,6 +337,14 @@ export default {
             this.$message.success(res.message);
             this.loading = false;
             this.dialog = false;
+            // this.tableData.push(
+            //   {
+            //     ...this.form,
+            //     rootname:'普通用户',
+            //     userroot:'b'
+            //   }
+            // )
+            // console.log(this.tableData);
             this.form = {
               username: "",
               nickname: "",
@@ -400,6 +417,34 @@ export default {
         this.loading = false;
       }, 1500);
     },
+    // 翻页
+    test(val){
+      console.log(1212312321,val);
+      let data = {
+        pageNum : val,
+        pageSize : 10
+      }
+      getPageInfo({
+        url:'/getPageInfo',
+        method:'post',
+        data,
+        headers: {
+          Authorization: this.tarr1 + " " + this.tarr2,
+        },
+      }).then(res=>{
+        console.log(res);
+        if(res.status === 0){
+          this.loading = true
+          setTimeout(()=>{
+            this.tableData = res.data
+            this.loading = false
+          },1000)
+          
+        } else {
+          this.$message.error(res.message)
+        }
+      })
+    }
   },
 };
 </script>
