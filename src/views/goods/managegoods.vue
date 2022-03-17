@@ -78,7 +78,7 @@
         </el-pagination>
       </el-card>
     </div>
-        <!-- 新增弹窗 -->
+    <!-- 新增弹窗 -->
     <el-drawer
       title="新增商品"
       :before-close="handleClose"
@@ -100,21 +100,28 @@
           </el-form-item>
           <!-- 商品类型最好是选择框 -->
           <el-form-item label="商品类型" label-width="70px">
-            <el-input
-              v-model="form.goods_type"
-              autocomplete="off"
-              size="small"
-              style="width: 320px"
-            ></el-input>
+            <el-select v-model="value" clearable placeholder="请选择商品类型">
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
           </el-form-item>
           <el-form-item label="商品图片" label-width="70px">
             <el-upload
+              ref="upload"
               action=""
+              v-model="this.form.goods_pic"
               list-type="picture-card"
               :http-request="upLoadPic"
+              :on-change="getUrl"
               :on-preview="handlePictureCardPreview"
-              :on-remove="handleRemove">
-            <i class="el-icon-plus"></i>  
+              :on-remove="handleRemove"
+            >
+              <i class="el-icon-plus"></i>
             </el-upload>
           </el-form-item>
           <el-form-item label="商品价格" label-width="70px">
@@ -151,102 +158,176 @@
       </div>
     </el-drawer>
     <el-dialog :visible.sync="dialogVisible">
-      <img width="100%" :src="dialogImageUrl" alt="">
+      <img width="100%" :src="dialogImageUrl" alt="" />
     </el-dialog>
   </div>
 </template>
 
 <script>
-
-import { goodsInfo, goodsadd } from '../../network/goods'
+import { goodsInfo, goodsadd } from "../../network/goods";
 
 export default {
   data() {
     return {
-      tarr1:'',
-      tarr2:'',
-      input:'',
-      count:0,
-      loading:false,
-      dialog:false,
+      tarr1: "",
+      tarr2: "",
+      input: "",
+      value: "",
+      goods_pic: "",
+      count: 0,
+      loading: false,
+      dialog: false,
       dialogVisible: false,
-      dialogImageUrl: '',
-      tableData:[],
+      dialogImageUrl: "",
+      tableData: [],
       // 新增表单数据
-      form:{
-        goods_name:'',
-        goods_type:'',
-        goods_price:'',
-        discount_price:'',
-        goods_describe:''
+      form: {
+        goods_name: "",
+        goods_type: "",
+        goods_price: "",
+        discount_price: "",
+        goods_describe: "",
+        goods_pic: "",
       },
-      userinfo:JSON.parse(sessionStorage.getItem('userinfo')),
+      options: [
+        {
+          value: "a",
+          label: "A类商品",
+        },
+        {
+          value: "b",
+          label: "b类商品",
+        },
+        {
+          value: "c",
+          label: "c类商品",
+        },
+      ],
+      userinfo: JSON.parse(sessionStorage.getItem("userinfo")),
       tokenStr: sessionStorage.getItem("token"),
     };
   },
   created() {
+    // console.log(this.userinfo);
     this.tarr1 = this.tokenStr.split("").slice(0, 6).join("");
     this.tarr2 = this.tokenStr.split("").slice(6, this.tokenStr.length).join("");
     // 获取商品信息
     goodsInfo({
-      url:'/goodsinfo',
+      url: "/goodsinfo",
       headers: {
         Authorization: this.tarr1 + " " + this.tarr2,
-      }
-    }).then(res=>{
+      },
+    }).then((res) => {
       console.log(res);
-      if(res.status === 0){
-        this.tableData = res.data.slice(0,10)
-        this.count = res.count
-      } else{
-        this.$message.error(res.message)
+      if (res.status === 0) {
+        this.tableData = res.data.slice(0, 10);
+        this.count = res.count;
+      } else {
+        this.$message.error(res.message);
       }
-    })
+    });
   },
   methods: {
     // 添加商品
     addGoods() {
       // console.log(this.userinfo);
-      if(this.userinfo.userroot !== 'a'){
-        this.$message.error('您没有操作权限')
-      }else{
+      if (this.userinfo.userroot !== "a") {
+        this.$message.error("您没有操作权限");
+      } else {
         this.dialog = true;
       }
     },
     // 关闭弹窗
-    handleClose(){
+    handleClose() {
+      this.form = {
+        goods_name: "",
+        goods_type: "",
+        goods_price: "",
+        discount_price: "",
+        goods_describe: "",
+      };
+      this.$refs.upload.clearFiles();
       this.dialog = false;
     },
     // 取消
-    cancelForm(){
+    cancelForm() {
+      this.form = {
+        goods_name: "",
+        goods_type: "",
+        goods_price: "",
+        discount_price: "",
+        goods_describe: "",
+      };
+      this.$refs.upload.clearFiles();
       this.dialog = false;
     },
     // 提交新增信息
-    closeDrawer(){
-
+    closeDrawer() {
+      // console.log(this.form);
+      if (this.userinfo.userroot !== "a") {
+        this.$message.error("您没有操作权限");
+      } else {
+        this.form.goods_type = this.value;
+        this.loading = true;
+        let form = {
+          ...this.form,
+          goods_pic: this.goods_pic,
+        };
+        // 增加商品
+        goodsadd({
+          url: "/goodsadd",
+          method: "post",
+          data: form,
+          headers: {
+            Authorization: this.tarr1 + " " + this.tarr2,
+          },
+        }).then((res) => {
+          console.log(res);
+          if (res.status === 0) {
+            setTimeout(() => {
+              this.form = {
+                goods_name: "",
+                goods_type: "",
+                goods_price: "",
+                discount_price: "",
+                goods_describe: "",
+              };
+              this.$refs.upload.clearFiles();
+              this.loading = false;
+              this.value = "";
+              this.handleClose();
+              this.$message.success(res.message);
+            }, 1000);
+          } else {
+            this.$message.error(res.message);
+          }
+        });
+      }
     },
     // 搜索商品
     searchgoods() {},
     // 重置
     reset() {},
     // 删除商品
-    deleteRow(){
-
-    },
+    deleteRow() {},
     // 翻页
-    changePage(val){
-
-    },
+    changePage(val) {},
     handleRemove(file, fileList) {
-      console.log(file, fileList);
-      },
+      // console.log(file, fileList);
+      file = "";
+      fileList = [];
+    },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
-    upLoadPic(){
-
-    }
+    upLoadPic(file) {
+      // console.log(file);
+    },
+    getUrl(file, fileList) {
+      // console.log(file,fileList[0].url);
+      this.goods_pic = fileList[0].url;
+    },
   },
 };
 </script>
@@ -271,10 +352,10 @@ export default {
   justify-content: space-around;
   align-items: center;
 }
-.el-form-item{
+.el-form-item {
   margin-left: 20px;
 }
-.el-form-item /deep/.el-upload-list--picture-card .el-upload-list__item{
+.el-form-item /deep/.el-upload-list--picture-card .el-upload-list__item {
   width: 60px;
   height: 60px;
 }
