@@ -74,11 +74,12 @@
           </el-table-column>
         </el-table>
         <el-pagination
-          style="margin-left:43%;margin-top:15px"
+          style="margin-left: 43%; margin-top: 15px"
           layout="prev, pager, next"
           :page-size="10"
           @current-change="changePage"
-          :total="count">
+          :total="count"
+        >
         </el-pagination>
       </el-card>
     </div>
@@ -140,17 +141,15 @@
 </template>
 
 <script>
-import { getAllInfo, removeuser, adduser, searchuser, changeRoot, getPageInfo } from "../../network/userInfo";
+import request from "../../network/request2";
 
 export default {
   data() {
     return {
-      tarr1: "",
-      tarr2: "",
-      tokenStr: sessionStorage.getItem("token"),
+      token: sessionStorage.getItem("token"),
       id: sessionStorage.getItem("id"),
-      tableData: [],  //表格渲染数据
-      tabledata: [],  //临时表格数据
+      tableData: [], //表格渲染数据
+      tabledata: [], //临时表格数据
       userinfo: {},
       // visiable: true,
       dialog: false,
@@ -162,7 +161,7 @@ export default {
         password: "",
       },
       input: "",
-      count:0,
+      count: 0,
       options: [
         {
           value: "a",
@@ -180,70 +179,66 @@ export default {
     };
   },
   created() {
-    this.tarr1 = this.tokenStr.split("").slice(0, 6).join("");
-    this.tarr2 = this.tokenStr.split("").slice(6, this.tokenStr.length).join("");
     this.loading = true;
     let userinfo = JSON.parse(sessionStorage.getItem("userinfo"));
     this.userinfo = userinfo;
-    // 判断显隐
-    // if (userinfo.userroot === "a") {
-    //   this.visiable = true;
-    // } else {
-    //   this.visiable = false;
-    // }
-    // 获取全部用户信息
-    getAllInfo({
-      url: "/getallinfo",
-      method: "get",
-      headers: {
-        Authorization: this.tarr1 + " " + this.tarr2,
-      },
-    }).then((res) => {
-      console.log(res);
-      if (res.status === 0) {
-        this.tableData = res.data.slice(0,10);
-        this.tableData.map((v) => {
-          if (v.userroot === "a") {
-            v.rootname = "超级管理员";
-          } else if (v.userroot === "b") {
-            v.rootname = "普通用户";
-          } else if (v.userroot === "c") {
-            v.rootname = "其他用户";
-          }
-        });
-        this.count = res.count
-        setTimeout(() => {
-          this.loading = false;
-        }, 1500);
-        console.log(this.tableData);
-      }
-    });
+    this.getUserInfo();
   },
   methods: {
+    // 获取用户信息
+    getUserInfo() {
+      const data = {};
+      request.get("/my/getallinfo", data, this.token).then((res) => {
+        console.log(res);
+        if (res.status === 0) {
+          this.tableData = res.data.slice(0, 10);
+          this.tableData.map((v) => {
+            if (v.userroot === "a") {
+              v.rootname = "超级管理员";
+            } else if (v.userroot === "b") {
+              v.rootname = "普通用户";
+            } else if (v.userroot === "c") {
+              v.rootname = "其他用户";
+            }
+          });
+          this.count = res.count;
+          setTimeout(() => {
+            this.loading = false;
+          }, 1500);
+          console.log(this.tableData);
+        }
+      });
+    },
     // 删除用户
     deleteRow(val, index, rows) {
       console.log(val, index, rows);
-      const url = "/removeuser";
       if (this.userinfo.userroot === "a") {
-        removeuser({
-          url,
-          method: "post",
-          data: {
-            id: val.id,
-          },
-          headers: {
-            Authorization: this.tarr1 + " " + this.tarr2,
-          },
-        }).then((res) => {
-          console.log(res);
-          if (res.status === 0) {
-            if (this.tableData.length >= 1) {
-              this.tableData.splice(index, 1);
-            } else {
-              this.$message.error("最少保留一条数据");
-            }
-          }
-        });
+        const data = {
+          id: val.id,
+        };
+        this.$confirm("是否确认移除该用户", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        })
+          .then(() => {
+            request.post("/my/removeuser", data, this.token).then((res) => {
+              console.log(res);
+              if (res.status === 0) {
+                if (this.tableData.length >= 1) {
+                  this.getUserInfo();
+                } else {
+                  this.$message.error("最少保留一条数据");
+                }
+              }
+            });
+          })
+          .catch(() => {
+            this.$message({
+              type: "info",
+              message: "已取消修改",
+            });
+          });
       } else {
         this.$message.error("您没有操作权限");
       }
@@ -262,14 +257,7 @@ export default {
           type: "warning",
         })
           .then(() => {
-            changeRoot({
-              url: "/changeroot",
-              method: "post",
-              data: data,
-              headers: {
-                Authorization: this.tarr1 + " " + this.tarr2,
-              },
-            }).then((res) => {
+            request.post("/my/changeroot", data, this.token).then((res) => {
               console.log(res);
               if (res.status === 0) {
                 this.$message.success(res.message);
@@ -307,7 +295,7 @@ export default {
       this.loading = false;
       this.dialog = false;
     },
-    // 提交表单
+    // 提交新增表单
     closeDrawer() {
       console.log(this.form);
       this.loading = true;
@@ -325,90 +313,43 @@ export default {
         this.loading = false;
       } else {
         // 增加用户
-        adduser({
-          url: "/adduser",
-          method: "post",
-          data: from,
-          headers: {
-            Authorization: this.tarr1 + " " + this.tarr2,
-          },
-        }).then((res) => {
+        request.post("/my/adduser", from, this.token).then((res) => {
           console.log(res);
           if (res.status === 0) {
             this.$message.success(res.message);
-            this.loading = false;
             this.dialog = false;
-            // this.tableData.push(
-            //   {
-            //     ...this.form,
-            //     rootname:'普通用户',
-            //     userroot:'b'
-            //   }
-            // )
-            // console.log(this.tableData);
-            this.form = {
-              username: "",
-              nickname: "",
-              email: "",
-              password: "",
-            };
+            this.clearForm();
+            this.getUserInfo();
           } else if (res.status === 1) {
             this.$message.error(res.message);
-            this.loading = false;
-            this.form = {
-              username: "",
-              nickname: "",
-              email: "",
-              password: "",
-            };
+            this.clearForm();
           }
         });
       }
-
-      // this.form={
-      //   username:'',
-      //   nickname:'',
-      //   email:'',
-      //   password:''
-      // }
     },
     // 查询用户
     searchuser() {
       console.log(this.input);
       this.loading = true;
-      const username = this.input
-      // let id = "";
-      // this.tableData.map((v) => {
-      //   if (this.input === v.username) {
-      //     return (id = v.id);
-      //   }
-      // });
-      // if (id === "") {
-      //   this.$message.error("该用户不存在");
-      //   this.loading = false;
-      // } else {
-        searchuser({
-          url: "/searchuser",
-          method: "post",
-          data: { username },
-          headers: {
-            Authorization: this.tarr1 + " " + this.tarr2,
-          },
-        }).then((res) => {
-          console.log(res);
-          if (res.status === 0) {
-            this.tabledata = this.tableData;
-            setTimeout(() => {
-              this.tableData = res.data;
-              this.loading = false;
-            }, 1000);
-          } else {
-            this.$message.error(res.message);
-            setTimeout(() => {
-              this.loading = false;
-            }, 1000);
-          }
-        });
+      const data = {
+        username : this.input
+      }
+      request.post('/my/searchuser',data,this.token)
+      .then((res) => {
+        console.log(res);
+        if (res.status === 0) {
+          this.tabledata = this.tableData;
+          setTimeout(() => {
+            this.tableData = res.data;
+            this.loading = false;
+          }, 1000);
+        } else {
+          this.$message.error(res.message);
+          setTimeout(() => {
+            this.loading = false;
+          }, 1000);
+        }
+      });
       // }
     },
     // 重置
@@ -420,33 +361,36 @@ export default {
       }, 1500);
     },
     // 翻页
-    changePage(val){
-      console.log(1212312321,val);
+    changePage(val) {
+      console.log(1212312321, val);
       let data = {
-        pageNum : val,
-        pageSize : 10
-      }
-      getPageInfo({
-        url:'/getPageInfo',
-        method:'post',
-        data,
-        headers: {
-          Authorization: this.tarr1 + " " + this.tarr2,
-        },
-      }).then(res=>{
+        pageNum: val,
+        pageSize: 10,
+      };
+      request.post('/my/getPageInfo',data,this.token)
+      .then((res) => {
         console.log(res);
-        if(res.status === 0){
-          this.loading = true
-          setTimeout(()=>{
-            this.tableData = res.data
-            this.loading = false
-          },1000)
-          
+        if (res.status === 0) {
+          this.loading = true;
+          setTimeout(() => {
+            this.tableData = res.data;
+            this.loading = false;
+          }, 1000);
         } else {
-          this.$message.error(res.message)
+          this.$message.error(res.message);
         }
-      })
-    }
+      });
+    },
+    // 清空表单
+    clearForm() {
+      this.loading = false;
+      this.form = {
+        username: "",
+        nickname: "",
+        email: "",
+        password: "",
+      };
+    },
   },
 };
 </script>

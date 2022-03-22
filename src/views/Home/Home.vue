@@ -77,9 +77,7 @@ export default {
     return {
       tableData: [],
       imgUrl,
-      tarr1: "",
-      tarr2: "",
-      tokenStr: sessionStorage.getItem("token"),
+      token: sessionStorage.getItem("token"),
       id: sessionStorage.getItem("id"),
       userinfo: {},
       isAction: true,
@@ -287,16 +285,14 @@ export default {
     }
   },
   created() {
-    this.tarr1 = this.tokenStr.split("").slice(0, 6).join("");
-    this.tarr2 = this.tokenStr.split("").slice(6, this.tokenStr.length).join("");
     infoRequest({
       url: "/userinfo",
       method: "get",
-      params: {
+      params: {                                               
         id: this.id,
       },
       headers: {
-        Authorization: this.tarr1 + " " + this.tarr2,
+        Authorization: this.token,
       },
     }).then((res) => {
       this.userinfo = res.data;

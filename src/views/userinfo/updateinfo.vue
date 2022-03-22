@@ -22,7 +22,9 @@
             @change="changeName(nickname)"
           >
           </el-input>
-          <el-button type="text" @click="updatename" style="margin-left:10px">点击修改</el-button>
+          <el-button type="text" @click="updatename" style="margin-left: 10px"
+            >点击修改</el-button
+          >
           <br />
           <span>邮 箱：</span>
           <el-input
@@ -35,7 +37,9 @@
             @change="changeEmail(email)"
           >
           </el-input>
-          <el-button type="text" @click="updateemail" style="margin-left:10px">点击修改</el-button>
+          <el-button type="text" @click="updateemail" style="margin-left: 10px"
+            >点击修改</el-button
+          >
         </div>
         <hr style="margin: 15px 0" />
         <!-- 密码修改 -->
@@ -86,7 +90,7 @@
           <el-button
             style="margin-left: 40%; margin-top: 10px"
             @click="updatePwd"
-             type="text"
+            type="text"
             >确认修改</el-button
           >
         </div>
@@ -96,34 +100,29 @@
 </template>
 
 <script>
-import { infoPostRequest, updatePwdRequest, updatePicRequest } from "../../network/userInfo";
+import request from "../../network/request2";
 
 import imgUrl from "@/assets/images/defaultPic.png";
 
 export default {
+  inject:['reload'],
   data() {
     return {
       userinfo: {},
       imgUrl,
       nickname: "",
       email: "",
-      tarr1: "",
-      tarr2: "",
       password: "",
       newpassword: "",
       secpassword: "",
       icon: true,
       newIcon: true,
       secIcon: true,
-      tokenStr: sessionStorage.getItem("token"),
+      token: sessionStorage.getItem("token"),
       id: sessionStorage.getItem("id"),
     };
   },
   created() {
-    // 获取Bearer字符串以及token
-    this.tarr1 = this.tokenStr.split("").slice(0, 6).join("");
-    this.tarr2 = this.tokenStr.split("").slice(6, this.tokenStr.length).join("");
-
     this.userinfo = JSON.parse(sessionStorage.getItem("userinfo"));
     this.nickname = this.userinfo.nickname;
     this.email = this.userinfo.email;
@@ -143,17 +142,11 @@ export default {
         type: "warning",
       })
         .then(() => {
-          infoPostRequest({
-            url: "/userinfo",
-            method: "post",
-            data: {
-              nickname: this.nickname,
-              id: this.id,
-            },
-            headers: {
-              Authorization: this.tarr1 + " " + this.tarr2,
-            },
-          }).then((res) => {
+          const data = {
+            nickname: this.nickname,
+            id: this.id,
+          };
+          request.post("/my/userinfo", data, this.token).then((res) => {
             console.log(res);
             if (res.status === 0) {
               this.$message({
@@ -178,17 +171,11 @@ export default {
         type: "warning",
       })
         .then(() => {
-          infoPostRequest({
-            url: "/userinfo",
-            method: "post",
-            data: {
-              email: this.email,
-              id: this.id,
-            },
-            headers: {
-              Authorization: this.tarr1 + " " + this.tarr2,
-            },
-          }).then((res) => {
+          const data = {
+            email: this.email,
+            id: this.id,
+          };
+          request.post("/my/userinfo", data, this.token).then((res) => {
             console.log(res);
             if (res.status === 0) {
               this.$message({
@@ -236,19 +223,13 @@ export default {
           type: "warning",
         })
           .then(() => {
+            const data = {
+              newpwd: this.secpassword,
+              oldpwd: this.password,
+              id: this.id,
+            };
             // 发送修改请求
-            updatePwdRequest({
-              url: "/updatepwd",
-              method: "post",
-              data: {
-                newpwd: this.secpassword,
-                oldpwd: this.password,
-                id: this.id,
-              },
-              headers: {
-                Authorization: this.tarr1 + " " + this.tarr2,
-              },
-            }).then((res) => {
+            request.post("/my/updatepwd", data, this.token).then((res) => {
               if (res.status === 0) {
                 this.$message({
                   type: "success",
@@ -304,24 +285,22 @@ export default {
               this.$message.error("上传图片不能超过300kb");
             } else {
               let user_pic = render.result;
+              const data = {
+                id,
+                user_pic,
+              };
               // 提交图片
-              updatePicRequest({
-                url: "/updatepic",
-                method: "post",
-                data: {
-                  id,
-                  user_pic,
-                },
-                headers: {
-                  Authorization: this.tarr1 + " " + this.tarr2,
-                },
-              }).then((res) => {
-                if(res.status === 0){
-                  this.userinfo.user_pic = user_pic
-                  sessionStorage.setItem('userinfo',JSON.stringify(this.userinfo))
-                  this.$message.success(res.message + '，若发现修改没变化请尝试刷新或稍后再试')
-                } else{
-                  this.$message.error(res.message)
+              request.post("/my/updatepic", data, this.token).then((res) => {
+                if (res.status === 0) {
+                  this.userinfo.user_pic = user_pic;
+                  sessionStorage.setItem("userinfo",JSON.stringify(this.userinfo)
+                  );
+                  this.reload()
+                  this.$message.success(
+                    res.message + "，若发现修改没变化请尝试刷新或稍后再试"
+                  );
+                } else {
+                  this.$message.error(res.message);
                 }
               });
             }

@@ -169,8 +169,6 @@ import { goodsInfo, goodsadd } from "../../network/goods";
 export default {
   data() {
     return {
-      tarr1: "",
-      tarr2: "",
       input: "",
       value: "",
       goods_pic: "",
@@ -204,18 +202,16 @@ export default {
         },
       ],
       userinfo: JSON.parse(sessionStorage.getItem("userinfo")),
-      tokenStr: sessionStorage.getItem("token"),
+      token: sessionStorage.getItem("token"),
     };
   },
   created() {
     // console.log(this.userinfo);
-    this.tarr1 = this.tokenStr.split("").slice(0, 6).join("");
-    this.tarr2 = this.tokenStr.split("").slice(6, this.tokenStr.length).join("");
     // 获取商品信息
     goodsInfo({
       url: "/goodsinfo",
       headers: {
-        Authorization: this.tarr1 + " " + this.tarr2,
+        Authorization: this.token,
       },
     }).then((res) => {
       console.log(res);
@@ -251,15 +247,7 @@ export default {
     },
     // 取消
     cancelForm() {
-      this.form = {
-        goods_name: "",
-        goods_type: "",
-        goods_price: "",
-        discount_price: "",
-        goods_describe: "",
-      };
-      this.$refs.upload.clearFiles();
-      this.dialog = false;
+      this.handleClose()
     },
     // 提交新增信息
     closeDrawer() {
@@ -279,23 +267,15 @@ export default {
           method: "post",
           data: form,
           headers: {
-            Authorization: this.tarr1 + " " + this.tarr2,
+            Authorization: this.token,
           },
         }).then((res) => {
           console.log(res);
           if (res.status === 0) {
             setTimeout(() => {
-              this.form = {
-                goods_name: "",
-                goods_type: "",
-                goods_price: "",
-                discount_price: "",
-                goods_describe: "",
-              };
-              this.$refs.upload.clearFiles();
-              this.loading = false;
               this.value = "";
               this.handleClose();
+              this.loading = false
               this.$message.success(res.message);
             }, 1000);
           } else {
@@ -312,11 +292,13 @@ export default {
     deleteRow() {},
     // 翻页
     changePage(val) {},
+    // 图片删除
     handleRemove(file, fileList) {
       // console.log(file, fileList);
       file = "";
       fileList = [];
     },
+    // 图片查看
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
@@ -327,6 +309,7 @@ export default {
     getUrl(file, fileList) {
       // console.log(file,fileList[0].url);
       this.goods_pic = fileList[0].url;
+      console.log(this.goods_pic);
     },
   },
 };

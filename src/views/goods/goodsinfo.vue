@@ -20,7 +20,7 @@
 
 
 <script>
-import { goodsInfo } from "../../network/goods";
+import request from '../../network/request2'
 
 import imgUrl from "@/assets/images/noimg.png";
 
@@ -28,21 +28,14 @@ export default {
   data() {
     return {
       imgUrl,
-      tarr1: "",
-      tarr2: "",
       goodsinfo:{},
-      tokenStr: sessionStorage.getItem("token"),
+      token: sessionStorage.getItem("token"),
     };
   },
   created() {
-    this.tarr1 = this.tokenStr.split("").slice(0, 6).join("");
-    this.tarr2 = this.tokenStr.split("").slice(6, this.tokenStr.length).join("");
-    goodsInfo({
-      url: "/goodsinfo",
-      headers: {
-        Authorization: this.tarr1 + " " + this.tarr2,
-      },
-    }).then((res) => {
+    const data = {}
+    request.get('/goods/goodsinfo',data,this.token)
+    .then((res) => {
       if(res.status === 0){
         this.goodsinfo = {
           ...res.data

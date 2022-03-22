@@ -38,7 +38,10 @@ export default {
           data: userdata,
         }).then((res) => {
           if (res.status === 0) {
-            sessionStorage.setItem('token',res.token)
+            let token = res.token.split("").slice(0, 6).join("") + " " + res.token.split("").slice(6, res.token.length).join("");
+            // console.log(token);
+            localStorage.setItem('token',token)
+            sessionStorage.setItem('token',token)
             sessionStorage.setItem('id',res.id)
             this.$message.success(res.message)
             this.$router.push("/main");

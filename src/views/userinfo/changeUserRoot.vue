@@ -60,6 +60,7 @@
 <script>
 import imgUrl from "@/assets/images/defaultPic.png";
 import { getAllInfo, changeRoot } from "../../network/userInfo";
+import request from '../../network/request2'
 
 export default {
   data() {
@@ -67,9 +68,7 @@ export default {
       imgUrl,
       userinfo: {},
       tableData: [],
-      tarr1: "",
-      tarr2: "",
-      tokenStr: sessionStorage.getItem("token"),
+      token: sessionStorage.getItem("token"),
       options: [
         {
           value: "a",
@@ -87,18 +86,10 @@ export default {
     };
   },
   created() {
-    this.tarr1 = this.tokenStr.split("").slice(0, 6).join("");
-    this.tarr2 = this.tokenStr.split("").slice(6, this.tokenStr.length).join("");
     this.userinfo = JSON.parse(sessionStorage.getItem("userinfo"));
     console.log(this.userinfo);
-    // 获取用户信息
-    getAllInfo({
-      url: "/getallinfo",
-      method: "get",
-      headers: {
-        Authorization: this.tarr1 + " " + this.tarr2,
-      },
-    }).then((res) => {
+    request.get('/my/getallinfo',this.token)
+    .then((res) => {
       console.log(res);
       if (res.status === 0) {
         this.tableData = res.data;

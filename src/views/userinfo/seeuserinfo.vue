@@ -19,33 +19,24 @@
 </template>
 
 <script>
-import { infoRequest } from "../../network/userInfo";
 import imgUrl from "@/assets/images/defaultPic.png";
+import request from '../../network/request2'
 
 export default {
   data() {
     return {
-      tarr1: "",
-      tarr2: "",
       userinfo: {},
       imgUrl,
-      tokenStr: sessionStorage.getItem("token"),
+      token: sessionStorage.getItem("token"),
       id: sessionStorage.getItem("id"),
     };
   },
   created() {
-    this.tarr1 = this.tokenStr.split("").slice(0, 6).join("");
-    this.tarr2 = this.tokenStr.split("").slice(6, this.tokenStr.length).join("");
-    infoRequest({
-      url: "/userinfo",
-      method: "get",
-      params: {
-        id: this.id,
-      },
-      headers: {
-        Authorization: this.tarr1 + " " + this.tarr2,
-      },
-    }).then((res) => {
+    const params ={
+      id: this.id
+    }
+    request.get('/my/userinfo',params, this.token)
+    .then((res) => {
       if (res.status === 0) {
         this.userinfo = res.data;
         if (this.userinfo.userroot === "a") {
