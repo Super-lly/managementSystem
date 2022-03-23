@@ -276,6 +276,7 @@ export default {
           const id = this.id;
           // console.log(this.$refs.file.files[0]);
           let file = this.$refs.file.files[0];
+          // console.log(file);
           let maxSize = 300 * 1024;
           // 将图片转为base64格式
           const render = new FileReader();

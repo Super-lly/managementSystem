@@ -120,6 +120,7 @@
               :on-change="getUrl"
               :on-preview="handlePictureCardPreview"
               :on-remove="handleRemove"
+              :before-remove="beforeRemove"
             >
               <i class="el-icon-plus"></i>
             </el-upload>
@@ -165,13 +166,14 @@
 
 <script>
 import { goodsInfo, goodsadd } from "../../network/goods";
+import request from "../../network/request2";
 
 export default {
   data() {
     return {
       input: "",
       value: "",
-      goods_pic: "",
+      goods_pic: [],
       count: 0,
       loading: false,
       dialog: false,
@@ -194,11 +196,11 @@ export default {
         },
         {
           value: "b",
-          label: "b类商品",
+          label: "B类商品",
         },
         {
           value: "c",
-          label: "c类商品",
+          label: "C类商品",
         },
       ],
       userinfo: JSON.parse(sessionStorage.getItem("userinfo")),
@@ -207,23 +209,22 @@ export default {
   },
   created() {
     // console.log(this.userinfo);
-    // 获取商品信息
-    goodsInfo({
-      url: "/goodsinfo",
-      headers: {
-        Authorization: this.token,
-      },
-    }).then((res) => {
-      console.log(res);
-      if (res.status === 0) {
-        this.tableData = res.data.slice(0, 10);
-        this.count = res.count;
-      } else {
-        this.$message.error(res.message);
-      }
-    });
+    this.goodsInfo();
   },
   methods: {
+    // 获取商品信息
+    goodsInfo() {
+      const data = {};
+      request.get("/goods/goodsinfo", data, this.token).then((res) => {
+        // console.log(res);
+        if (res.status === 0) {
+          this.tableData = res.data.slice(0, 10);
+          this.count = res.count;
+        } else {
+          this.$message.error(res.message);
+        }
+      });
+    },
     // 添加商品
     addGoods() {
       // console.log(this.userinfo);
@@ -247,7 +248,7 @@ export default {
     },
     // 取消
     cancelForm() {
-      this.handleClose()
+      this.handleClose();
     },
     // 提交新增信息
     closeDrawer() {
@@ -261,22 +262,15 @@ export default {
           ...this.form,
           goods_pic: this.goods_pic,
         };
-        // 增加商品
-        goodsadd({
-          url: "/goodsadd",
-          method: "post",
-          data: form,
-          headers: {
-            Authorization: this.token,
-          },
-        }).then((res) => {
+        request.post("/goods/goodsadd", form, this.token).then((res) => {
           console.log(res);
           if (res.status === 0) {
             setTimeout(() => {
               this.value = "";
               this.handleClose();
-              this.loading = false
+              this.loading = false;
               this.$message.success(res.message);
+              this.goodsInfo();
             }, 1000);
           } else {
             this.$message.error(res.message);
@@ -285,16 +279,86 @@ export default {
       }
     },
     // 搜索商品
-    searchgoods() {},
+    searchgoods() {
+      const data = {
+        goods_name: this.input,
+      };
+      this.loading =true
+      request.post("/goods/goodssearch", data, this.token).then((res) => {
+        console.log(res);
+        if (res.status === 0) {
+          this.tabledata = this.tableData;
+          setTimeout(() => {
+            this.tableData = res.data;
+            this.loading = false;
+          }, 1000);
+        } else {
+          this.$message.error(res.message);
+          setTimeout(() => {
+            this.loading = false;
+          }, 1000);
+        }
+      });
+    },
     // 重置
-    reset() {},
+    reset() {
+      this.loading = true;
+      setTimeout(() => {
+        this.tableData = this.tabledata;
+        this.loading = false;
+      }, 1500);
+    },
     // 删除商品
-    deleteRow() {},
+    deleteRow(val) {
+      console.log(val);
+      const data = {
+        goods_id: val.goods_id,
+      };
+      this.$confirm("是否确认移除该商品", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          request.post("/goods/goodsdelete", data, this.token).then((res) => {
+            // console.log(res);
+            if (res.status === 0) {
+              this.$message.success(res.message);
+              this.goodsInfo();
+            } else {
+              this.$message.error(res.message);
+            }
+          });
+        })
+        .catch(() => {
+          this.$message.info("操作已取消");
+        });
+    },
+    // 编辑商品
+    editInfo(val) {
+      if (this.userinfo.userroot !== "a") {
+        this.$message.error("您没有操作权限");
+      } else {
+      }
+    },
     // 翻页
     changePage(val) {},
+    // 图片删除前操作
+    beforeRemove(file, fileList) {
+      let index = "";
+      fileList.forEach((v) => {
+        if (file.uid === v.uid) {
+          index = fileList.indexOf(v);
+        }
+      });
+      this.goods_pic.splice(index, 1);
+    },
     // 图片删除
     handleRemove(file, fileList) {
       // console.log(file, fileList);
+      fileList.forEach((v) => {
+        console.log(v);
+      });
       file = "";
       fileList = [];
     },
@@ -303,13 +367,20 @@ export default {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
-    upLoadPic(file) {
-      // console.log(file);
-    },
+    upLoadPic(file) {},
+    // 获取图片数据
     getUrl(file, fileList) {
-      // console.log(file,fileList[0].url);
-      this.goods_pic = fileList[0].url;
-      console.log(this.goods_pic);
+      // console.log(fileList);
+      let maxSize = 300 * 1024;
+      let render = new FileReader();
+      render.readAsDataURL(file.raw);
+      render.onload = () => {
+        if (file.size >= maxSize) {
+          this.$message.error("上传图片不能超过300kb");
+        } else {
+          this.goods_pic.push(render.result);
+        }
+      };
     },
   },
 };
