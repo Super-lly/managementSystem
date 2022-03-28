@@ -121,6 +121,8 @@
               :on-preview="handlePictureCardPreview"
               :on-remove="handleRemove"
               :before-remove="beforeRemove"
+              :limit="3"
+              :on-exceed="picLimit"
             >
               <i class="el-icon-plus"></i>
             </el-upload>
@@ -161,14 +163,30 @@
     <el-dialog :visible.sync="dialogVisible">
       <img width="100%" :src="dialogImageUrl" alt="" />
     </el-dialog>
+    <!-- 编辑弹窗 -->
+    <edit-drawer
+      ref="editDrawer"
+      :form="form"
+      :options="options"
+      :isdialog="isdialog"
+      :userinfo="userinfo"
+      :value="value"
+      :goods_pic="goods_pic"
+      @changeVisiable="changeVisiable"
+      @changePic="changePic"
+    ></edit-drawer>
   </div>
 </template>
 
 <script>
-import { goodsInfo, goodsadd } from "../../network/goods";
 import request from "../../network/request2";
 
+import editDrawer from "./components/editDrawer.vue";
+
 export default {
+  components: {
+    editDrawer,
+  },
   data() {
     return {
       input: "",
@@ -177,6 +195,7 @@ export default {
       count: 0,
       loading: false,
       dialog: false,
+      isdialog: false,
       dialogVisible: false,
       dialogImageUrl: "",
       tableData: [],
@@ -187,7 +206,7 @@ export default {
         goods_price: "",
         discount_price: "",
         goods_describe: "",
-        goods_pic: "",
+        goods_pic: [],
       },
       options: [
         {
@@ -283,7 +302,7 @@ export default {
       const data = {
         goods_name: this.input,
       };
-      this.loading =true
+      this.loading = true;
       request.post("/goods/goodssearch", data, this.token).then((res) => {
         console.log(res);
         if (res.status === 0) {
@@ -339,6 +358,18 @@ export default {
       if (this.userinfo.userroot !== "a") {
         this.$message.error("您没有操作权限");
       } else {
+        this.isdialog = true;
+        this.value = val.goods_type;
+        this.form = {
+          ...val,
+        };
+        if (val.goods_pic) {
+          this.goods_pic = this.goods_pic.concat(val.goods_pic);
+          this.goods_pic.forEach((v) => {
+            let index = val.goods_code + this.goods_pic.indexOf(v).toString();
+            this.$refs.editDrawer.baseToUrl(v, index);
+          });
+        }
       }
     },
     // 翻页
@@ -370,7 +401,6 @@ export default {
     upLoadPic(file) {},
     // 获取图片数据
     getUrl(file, fileList) {
-      // console.log(fileList);
       let maxSize = 300 * 1024;
       let render = new FileReader();
       render.readAsDataURL(file.raw);
@@ -381,6 +411,26 @@ export default {
           this.goods_pic.push(render.result);
         }
       };
+    },
+    // 关闭编辑
+    changeVisiable() {
+      this.isdialog = false;
+      (this.value = ""),
+        (this.form = {
+          goods_name: "",
+          goods_type: "",
+          goods_price: "",
+          discount_price: "",
+          goods_describe: "",
+        });
+    },
+    // 清空编辑图片
+    changePic() {
+      this.goods_pic = [];
+    },
+    // 图片超过限制
+    picLimit(){
+      this.$message.warning('当前允许上传最大数量为 3 张!')
     },
   },
 };
