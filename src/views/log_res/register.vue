@@ -17,7 +17,8 @@
 </template>
 
 <script>
-import { userRequest } from "../../network/user";
+// import { userRequest } from "../../network/user";
+import request from '../../network/request2'
 
 export default {
   name: "Register",
@@ -45,12 +46,9 @@ export default {
         this.userdata.email = this.email
         this.userdata.password = this.password
         let userdata = this.userdata
-        console.log(userdata);
-        userRequest({
-          url:'/register',
-          method:'post',
-          data:userdata
-        }).then(res=>{
+        // console.log(userdata);
+        request.post('/api/register',userdata,)
+        .then(res=>{
           console.log(res);
           if(res.status === 0){
             this.$message.success(res.message)

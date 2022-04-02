@@ -18,7 +18,8 @@ import CommonHeader from "../components/CommonHeader.vue";
 
 import imgUrl from '@/assets/images/defaultPic.png'
 
-import { infoRequest } from '../network/userInfo'
+// import { infoRequest } from '../network/userInfo'
+import request from '../network/request2'
 
 export default {
   name: "Home",
@@ -42,16 +43,11 @@ export default {
     CommonHeader,
   },
   created() {
-    infoRequest({
-      url: "/userinfo",
-      method: "get",
-      params: {
-        id: this.id,
-      },
-      headers: {
-        Authorization: this.token,
-      },
-    }).then((res) => {
+    const params = {
+      id: this.id,
+    }
+    request.get('/my/userinfo',params,this.token)
+    .then((res) => {
       this.userinfo = res.data
       this.nickname = res.data.nickname ? res.data.nickname : "null";
       this.email = res.data.email ? res.data.email : "null";

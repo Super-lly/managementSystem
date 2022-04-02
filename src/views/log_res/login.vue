@@ -12,7 +12,8 @@
 </template>
 
 <script>
-import { userRequest } from "../../network/user";
+// import { userRequest } from "../../network/user";
+import request from '../../network/request2'
 
 export default {
   name: "Login",
@@ -32,11 +33,8 @@ export default {
         this.userdata.username = this.username;
         this.userdata.password = this.password;
         let userdata = this.userdata;
-        userRequest({
-          url: "/login",
-          method: "post",
-          data: userdata,
-        }).then((res) => {
+        request.post('/api/login',userdata)
+        .then((res) => {
           if (res.status === 0) {
             let token = res.token.split("").slice(0, 6).join("") + " " + res.token.split("").slice(6, res.token.length).join("");
             // console.log(token);

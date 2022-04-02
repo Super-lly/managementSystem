@@ -65,7 +65,8 @@
 
 <script>
 import { getHome } from "../../network/data";
-import { infoRequest } from '../../network/userInfo'
+// import { infoRequest } from '../../network/userInfo'
+import request from '../../network/request2'
 
 import * as echarts from "echarts";
 
@@ -285,16 +286,21 @@ export default {
     }
   },
   created() {
-    infoRequest({
-      url: "/userinfo",
-      method: "get",
-      params: {                                               
-        id: this.id,
-      },
-      headers: {
-        Authorization: this.token,
-      },
-    }).then((res) => {
+    // infoRequest({
+    //   url: "/userinfo",
+    //   method: "get",
+    //   params: {                                               
+    //     id: this.id,
+    //   },
+    //   headers: {
+    //     Authorization: this.token,
+    //   },
+    // })
+    const params = {
+      id:this.id
+    }
+    request.get('/my/userinfo',params,this.token)
+    .then((res) => {
       this.userinfo = res.data;
       // 用户身份判断
       if(this.userinfo.userroot === 'a'){
