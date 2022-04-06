@@ -1,7 +1,7 @@
 <template>
   <div class="changeuserroot">
     <!-- 用户信息 -->
-    <div class="usercard" style="margin-top:0">
+    <div class="usercard" style="margin-top: 0">
       <el-card
         shadow="hover"
         style="height: 30vh; width: 15vw; min-width: 230px; min-height: 230px"
@@ -18,9 +18,13 @@
         </div>
       </el-card>
     </div>
-    <div class="usertable" style="margin-top:10px">
+    <div class="usertable" style="margin-top: 10px">
       <el-card>
-        <el-table :data="tableData" style="width: 70%;margin-left:17%" max-height="380">
+        <el-table
+          :data="tableData"
+          style="width: 70%; margin-left: 17%"
+          max-height="380"
+        >
           <el-table-column fixed prop="username" label="用户名" width="200">
           </el-table-column>
           <el-table-column prop="nickname" label="昵称" width="170">
@@ -59,8 +63,8 @@
 
 <script>
 import imgUrl from "@/assets/images/defaultPic.png";
-import { getAllInfo, changeRoot } from "../../network/userInfo";
-import request from '../../network/request2'
+// import { getAllInfo, changeRoot } from "../../network/log&res";
+import request from "../../network/request2";
 
 export default {
   data() {
@@ -88,8 +92,7 @@ export default {
   created() {
     this.userinfo = JSON.parse(sessionStorage.getItem("userinfo"));
     console.log(this.userinfo);
-    request.get('/my/getallinfo',this.token)
-    .then((res) => {
+    request.get("/my/getallinfo", "").then((res) => {
       console.log(res);
       if (res.status === 0) {
         this.tableData = res.data;
@@ -105,45 +108,47 @@ export default {
       }
     });
   },
-  methods:{
-    deleteRow(row){
+  methods: {
+    deleteRow(row) {
       console.log(row);
       const data = {
-        id:row.id,
-        userroot:row.userroot
-      }
-      if(this.userinfo.userroot === 'a'){
-        this.$confirm('是否确认修改指定用户','提示',{
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(()=>{
-          changeRoot({
-            url:'/changeroot',
-            method:'post',
-            data:data,
-            headers: {
-              Authorization: this.tarr1 + " " + this.tarr2,
-            },
-          }).then(res=>{
-            console.log(res);
-            if(res.status === 0){
-              this.$message.success(res.message)
-            } else{
-              this.$message.error(res.message)
-            }
+        id: row.id,
+        userroot: row.userroot,
+      };
+      if (this.userinfo.userroot === "a") {
+        this.$confirm("是否确认修改指定用户", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        })
+          .then(() => {
+            changeRoot({
+              url: "/changeroot",
+              method: "post",
+              data: data,
+              headers: {
+                Authorization: this.tarr1 + " " + this.tarr2,
+              },
+            }).then((res) => {
+              console.log(res);
+              if (res.status === 0) {
+                this.$message.success(res.message);
+              } else {
+                this.$message.error(res.message);
+              }
+            });
           })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消修改'
-          });          
-        });
-      } else{
-        this.$message.error('您没有足够权限')
+          .catch(() => {
+            this.$message({
+              type: "info",
+              message: "已取消修改",
+            });
+          });
+      } else {
+        this.$message.error("您没有足够权限");
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

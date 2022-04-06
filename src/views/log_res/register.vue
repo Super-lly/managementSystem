@@ -18,7 +18,8 @@
 
 <script>
 // import { userRequest } from "../../network/user";
-import request from '../../network/request2'
+// import request from '../../network/request2'
+import register from '../../network/log&res'
 
 export default {
   name: "Register",
@@ -47,7 +48,7 @@ export default {
         this.userdata.password = this.password
         let userdata = this.userdata
         // console.log(userdata);
-        request.post('/api/register',userdata,)
+        register.post('/api/register',userdata)
         .then(res=>{
           console.log(res);
           if(res.status === 0){

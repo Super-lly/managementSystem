@@ -6,6 +6,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     isCollapse:false,
+    token:''
     // userinfo:{}
   },
   mutations: {
@@ -15,6 +16,9 @@ export default new Vuex.Store({
     // changeInfo(state,info){
     //   state.userinfo = info
     // }
+    setToken(state,token){
+      state.token = token
+    }
   },
   actions: {
   },
