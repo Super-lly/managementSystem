@@ -42,12 +42,13 @@ export default {
     CommonAside,
     CommonHeader,
   },
-  created() {
+  mounted() {
     const params = {
       id: this.id,
     }
     request.get('/my/userinfo',params,this.token)
     .then((res) => {
+      // console.log(res);
       this.userinfo = res.data
       this.nickname = res.data.nickname ? res.data.nickname : "null";
       this.email = res.data.email ? res.data.email : "null";

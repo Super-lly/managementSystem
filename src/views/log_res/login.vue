@@ -13,7 +13,8 @@
 
 <script>
 // import { userRequest } from "../../network/user";
-import log from '../../network/log&res'
+// import log from '../../network/log&res'
+import request from '../../network/request2'
 
 export default {
   name: "Login",
@@ -33,8 +34,10 @@ export default {
         this.userdata.username = this.username;
         this.userdata.password = this.password;
         let userdata = this.userdata;
-        log.post('/api/login',userdata)
+        console.log(userdata);
+        request.post('/api/login',userdata)
         .then((res) => {
+          console.log(res);
           if (res.status === 0) {
             let token = res.token.split("").slice(0, 6).join("") + " " + res.token.split("").slice(6, res.token.length).join("");
             // console.log(token);

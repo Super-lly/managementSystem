@@ -3,11 +3,14 @@
     <el-col :span="6" style="margin-top: 20rpx">
       <el-card shadow="hover" style="height: 280px">
         <div class="user">
-          <img :src="userinfo.user_pic ? userinfo.user_pic: imgUrl" alt="userpic" />
+          <img
+            :src="userinfo.user_pic ? userinfo.user_pic : imgUrl"
+            alt="userpic"
+          />
           <div class="userInfo">
-            <p class="name">{{userinfo.username}}</p>
-            <p class="access">{{userinfo.root}}</p>
-            <p class="nickname">昵称：{{userinfo.nickname}}</p>
+            <p class="name">{{ userinfo.username }}</p>
+            <p class="access">{{ userinfo.root }}</p>
+            <p class="nickname">昵称：{{ userinfo.nickname }}</p>
           </div>
         </div>
         <hr />
@@ -66,11 +69,11 @@
 <script>
 import { getHome } from "../../network/data";
 // import { infoRequest } from '../../network/userInfo'
-import request from '../../network/request2'
+import request from "../../network/request2";
 
 import * as echarts from "echarts";
 
-import imgUrl from '@/assets/images/defaultPic.png'
+import imgUrl from "@/assets/images/defaultPic.png";
 
 export default {
   name: "Home",
@@ -272,50 +275,42 @@ export default {
         const video = res.data.videoData;
         this.echartsData.video.series.push({
           // name:video.map(item=>item.name),
-          type:'pie',
-          data:video.map(item=>item.value)
-        })
-        const videoEchartsData = echarts.init(this.$refs.videoChart)
-        videoEchartsData.setOption(this.echartsData.video)
+          type: "pie",
+          data: video.map((item) => item.value),
+        });
+        const videoEchartsData = echarts.init(this.$refs.videoChart);
+        videoEchartsData.setOption(this.echartsData.video);
       });
     },
-    getInfo(){
+    getInfo() {
       // this.$store.commit('changeInfo',this.userinfo)
-      console.log(12345,this.userinfo);
-      sessionStorage.setItem('userinfo',this.userinfo)
-    }
+      console.log(12345, this.userinfo);
+      sessionStorage.setItem("userinfo", this.userinfo);
+    },
+    getUserInfo() {
+      const params = {
+        id: this.id,
+      };
+      request.get("/my/userinfo", params, this.token).then((res) => {
+        // console.log(res);
+        this.userinfo = res.data;
+        // 用户身份判断
+        if (this.userinfo.userroot === "a") {
+          this.userinfo.root = "超级管理员";
+        } else if (this.userinfo.userroot === "b") {
+          this.userinfo.root = "普通用户";
+        } else {
+          this.userinfo.root = "其他用户";
+        }
+        // this.getInfo()
+        sessionStorage.setItem("userinfo", JSON.stringify(this.userinfo));
+        console.log(this.userinfo);
+      });
+    },
   },
-  created() {
-    // infoRequest({
-    //   url: "/userinfo",
-    //   method: "get",
-    //   params: {                                               
-    //     id: this.id,
-    //   },
-    //   headers: {
-    //     Authorization: this.token,
-    //   },
-    // })
-    const params = {
-      id:this.id
-    }
-    request.get('/my/userinfo',params,this.token)
-    .then((res) => {
-      this.userinfo = res.data;
-      // 用户身份判断
-      if(this.userinfo.userroot === 'a'){
-        this.userinfo.root = '超级管理员'
-      } else if(this.userinfo.userroot === 'b'){
-        this.userinfo.root = '普通用户'
-      } else{
-        this.userinfo.root = '其他用户'
-      }
-      // this.getInfo()
-      sessionStorage.setItem('userinfo',JSON.stringify(this.userinfo))
-      console.log(this.userinfo);
-    });
-  },
+  created() {},
   mounted() {
+    this.getUserInfo();
     this.getTableData();
   },
 };
@@ -343,7 +338,7 @@ export default {
   padding: 0;
   margin: 0;
 }
-.nickname{
+.nickname {
   padding: 0;
   margin: 0;
 }
