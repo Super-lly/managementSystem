@@ -26,7 +26,7 @@
         <el-table
           v-loading="loading"
           :data="tableData"
-          style="width: 70%"
+          style="width: 80%"
           max-height="400"
         >
           <el-table-column fixed prop="username" label="用户名" width="200">
@@ -74,7 +74,7 @@
           </el-table-column>
         </el-table>
         <el-pagination
-          style="margin-left: 43%; margin-top: 15px"
+          style="position: fixed; left:50%; bottom:10vh"
           layout="prev, pager, next"
           :page-size="10"
           @current-change="changePage"
