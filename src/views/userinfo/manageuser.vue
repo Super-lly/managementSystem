@@ -226,6 +226,7 @@ export default {
               console.log(res);
               if (res.status === 0) {
                 if (this.tableData.length >= 1) {
+                  this.$message.success('删除指定用户成功')
                   this.getUserInfo();
                 } else {
                   this.$message.error("最少保留一条数据");
@@ -355,6 +356,7 @@ export default {
     // 重置
     reset() {
       this.loading = true;
+      this.input = ''
       setTimeout(() => {
         this.tableData = this.tabledata;
         this.loading = false;
