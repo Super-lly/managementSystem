@@ -1,7 +1,7 @@
 <template>
   <el-row :gutter="22" class="home_row">
     <el-col :span="6" style="margin-top: 20rpx">
-      <el-card shadow="hover" style="height: 280px">
+      <el-card shadow="hover" style="height: 280px;min-width:290px">
         <div class="user">
           <img
             :src="userinfo.user_pic ? userinfo.user_pic : imgUrl"
@@ -15,12 +15,12 @@
         </div>
         <hr />
         <div class="login_info">
-          <p>上次登录时间：<span>2021-12-14</span></p>
-          <p>上次登陆地点：<span>成都</span></p>
+          <p>登录时间：<span>{{loginTime}}</span></p>
+          <p>登陆地点：<span>成都</span></p>
         </div>
       </el-card>
       <el-card style="margin-top: 20px; height: 465px" shadow="hover">
-        <el-table :data="tableData">
+        <el-table :data="tableData" height="465">
           <el-table-column
             show-overflow-tooltip
             v-for="(v, k) in tableLabel"
@@ -46,29 +46,19 @@
             :style="{ background: item.color }"
           ></div>
           <div class="detail">
-            <p class="price">￥{{ item.value }}</p>
-            <p class="txt">￥{{ item.name }}</p>
+            <p class="price">{{ item.value }}</p>
+            <p class="txt">{{ item.name }}</p>
           </div>
         </el-card>
       </div>
-      <el-card shadow="hover" style="height: 280px">
-        <div ref="echart" style="height: 280px"></div>
+      <el-card shadow="hover" style="height: 380px;padding-top:0">
+        <div ref="echart" style="height: 380px;width:100%"></div>
       </el-card>
-      <div class="graph">
-        <el-card shadow="hover" style="height: 280px">
-          <div ref="barChart" style="height: 280px"></div>
-        </el-card>
-        <el-card shadow="hover" style="height: 280px">
-          <div ref="videoChart" style="height: 280px"></div>
-        </el-card>
-      </div>
     </el-col>
   </el-row>
 </template>
 
 <script>
-import { getHome } from "../../network/data";
-// import { infoRequest } from '../../network/userInfo'
 import request from "../../network/request2";
 
 import * as echarts from "echarts";
@@ -80,53 +70,41 @@ export default {
   data() {
     return {
       tableData: [],
+      loginTime:'',
       imgUrl,
       token: sessionStorage.getItem("token"),
       id: sessionStorage.getItem("id"),
       userinfo: {},
       isAction: true,
       tableLabel: {
-        name: "数字",
-        todayBuy: "今日购买",
-        mouthBuy: "本月购买",
-        totalBuy: "总购买",
+        time:'时间',
+        Temp: "温度",
+        Hum: "湿度"
       },
       countData: [
         {
-          name: "今日支付订单",
-          value: 1234,
+          name: "温度",
+          value: 'Temp',
           icon: "success",
           color: "#2ec7c9",
         },
         {
-          name: "今日收藏订单",
-          value: 210,
+          name: "湿度",
+          value: 'Hum',
           icon: "star-on",
           color: "#ffb980",
         },
         {
-          name: "今日未支付订单",
-          value: 1234,
+          name: "光照强度",
+          value: 'lux',
           icon: "s-goods",
           color: "#5ab1ef",
         },
         {
-          name: "本月支付订单",
-          value: 1234,
+          name: "空气质量",
+          value: 'AQI',
           icon: "success",
           color: "#2ec7c9",
-        },
-        {
-          name: "本月收藏订单",
-          value: 210,
-          icon: "star-on",
-          color: "#ffb980",
-        },
-        {
-          name: "本月未支付订单",
-          value: 1234,
-          icon: "s-goods",
-          color: "#5ab1ef",
         },
       ],
       echartsData: {
@@ -153,8 +131,10 @@ export default {
               },
             },
             axisLabel: {
+              rotate:20,
               interval: 0,
               color: "#333",
+              fontSize :'10'
             },
           },
           yAxis: [
@@ -176,110 +156,46 @@ export default {
             "#8d98b3",
           ],
           series: [],
-        },
-        user: {
-          legend: {
-            // 图例文字颜色
-            textStyle: {
-              color: "#333",
-            },
-          },
-          grid: {
-            left: "20%",
-          },
-          // 提示框
-          tooltip: {
-            trigger: "axis",
-          },
-          xAxis: {
-            type: "category",
-            data: [],
-            axisLine: {
-              lineStyle: {
-                color: "#17b3a3",
-              },
-            },
-            axisLabel: {
-              interval: 0,
-              color: "#333",
-            },
-          },
-          yAxis: [
-            {
-              type: "value",
-              axisLine: {
-                lineStyle: {
-                  color: "#17b3a3",
-                },
-              },
-            },
-          ],
-          color: ["#2ec7c9", "#b6a2de"],
-          series: [],
-        },
-        video: {
-          series: [],
-          color: [
-            "#0f78f4",
-            "#dd536b",
-            "#9462e5",
-            "#a6a6a6",
-            "#e1bb22",
-            "#39c362",
-            "#3ed1cf",
-          ],
-          tooltip: {
-            trigger: "item",
-          },
-        },
+        }
       },
     };
   },
   methods: {
     getTableData() {
-      getHome().then((res) => {
-        console.log(res);
-        this.tableData = res.data.tableData;
+      // getHome().then((res) => {
+        let data = ''
+        let token = sessionStorage.getItem('token')
+        request.get('/environment/data/socketData',data,token)
+        .then(res=>{
+        this.tableData = res.data;
         // 折线图展示
-        const order = res.data.orderData;
-        this.echartsData.order.xAxis.data = order.date;
-        let keyArray = Object.keys(order.data[0]);
+        const order = res.data
+        let orderArr = []
+        orderArr=order.map(v=>{
+          let obj = {
+            Temp:v.Temp,
+            Hum:v.Hum,
+            lux:v.lux,
+            AQI:v.AQI,
+          }
+          return obj
+        })
+        let orderTime = []
+        order.forEach(v=>{
+          orderTime.push(v.time)
+        })
+        this.echartsData.order.xAxis.data = orderTime;
+        let keyArray = Object.keys(orderArr[0]);
+        console.log(keyArray);
         keyArray.forEach((k) => {
           this.echartsData.order.series.push({
             type: "line",
             name: k,
-            data: order.data.map((item) => item[k]),
+            data: orderArr.map((item) => item[k]),
           });
         });
         const myEchartsData = echarts.init(this.$refs.echart);
         myEchartsData.setOption(this.echartsData.order);
-
-        // 柱状图展示
-        const user = res.data.userData;
-        console.log(user);
-        this.echartsData.user.xAxis.data = user.map((item) => item.data);
-        this.echartsData.user.series.push({
-          name: "新增用户",
-          type: "bar",
-          data: user.map((item) => item.new),
-        });
-        this.echartsData.user.series.push({
-          name: "活跃用户",
-          type: "bar",
-          data: user.map((item) => item.active),
-        });
-        const barEchartsData = echarts.init(this.$refs.barChart);
-        barEchartsData.setOption(this.echartsData.user);
-
-        // 饼图展示
-        const video = res.data.videoData;
-        this.echartsData.video.series.push({
-          // name:video.map(item=>item.name),
-          type: "pie",
-          data: video.map((item) => item.value),
-        });
-        const videoEchartsData = echarts.init(this.$refs.videoChart);
-        videoEchartsData.setOption(this.echartsData.video);
       });
     },
     getInfo() {
@@ -308,7 +224,9 @@ export default {
       });
     },
   },
-  created() {},
+  created() {
+    this.loginTime = sessionStorage.getItem('loginTime')
+  },
   mounted() {
     this.getUserInfo();
     this.getTableData();
@@ -380,10 +298,10 @@ export default {
   margin: 0;
 }
 .price {
-  font-size: 30px;
+  font-size: 22px;
 }
 .txt {
-  font-size: 12px;
+  font-size: 20px;
 }
 .graph {
   display: flex;

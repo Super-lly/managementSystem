@@ -58,6 +58,11 @@ const routes = [
       name: 'changeuserroot',
       component: () => import('../views/userinfo/changeUserRoot.vue')
     },
+    {
+      path: '/manageMsg',
+      name: 'manageMsg',
+      component: () => import('../views/message/manageMsg')
+    },
   ]
   }, 
 ]

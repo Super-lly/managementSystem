@@ -2,7 +2,7 @@
   <div class="goodsinfo">
     <div class="goods_cards">
       <el-card shadow="hover" 
-      style="height: 15vh; width: 35vw; min-width: 530px; min-height: 200px;margin-bottom:15px;cursor:pointer"
+      style="height: 15vh; width: 35vw; min-width: 530px; min-height: 200px;margin-bottom:15px;cursor:pointer;border-radius: 25px;"
        v-for="(item, index) in goodsinfo" :key="index">
         <div class="info">
           <div class="goods_img">
@@ -11,7 +11,10 @@
           <div class="goods_char">
             <p class="goods_name">{{item.goods_name}}</p>
             <p class="goods_describe">{{item.goods_describe}}</p>
-            <p class="goods_price">当前售价：<span style="color:red">￥{{item.goods_price}}</span></p>
+            <div style="font-size:13px">
+              <span class="goods_price" style="margin-left:10px">当前售价：<span style="color:red">￥{{item.goods_price}}</span></span>
+              <span class="discount_price" style="margin-left:20px">折扣价：<span style="color:red">￥{{item.discount_price}}</span></span>
+            </div>
           </div>
         </div>
       </el-card>
@@ -86,6 +89,7 @@ export default {
 }
 .goods_char .goods_describe{
   width: 22vw;
+  height: 40%;
   min-width: 335px;
   padding: 0 0 15px 15px;
   display: -webkit-box;
@@ -93,8 +97,9 @@ export default {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
 }
-.goods_char .goods_price{
-  width: 22vw;
+.goods_char .goods_price,
+.goods_char .discount_price{
+  width: 20%;
   min-width: 335px;
   text-align: center;
 }

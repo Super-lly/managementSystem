@@ -238,6 +238,9 @@ export default {
         // console.log(res);
         if (res.status === 0) {
           this.tableData = res.data.slice(0, 10);
+          this.tableData.forEach(v=>{
+            v.discount = (v.discount_price/v.goods_price * 10).toFixed(1)  + '折'
+          })
           this.count = res.count;
         } else {
           this.$message.error(res.message);

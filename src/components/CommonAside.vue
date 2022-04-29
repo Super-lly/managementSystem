@@ -111,6 +111,20 @@ export default {
             },
           ]
         },
+        {
+          name: "mall",
+          label: "留言",
+          icon: "video-play",
+          children:[
+            {
+              path: "/manageMsg",
+              name: "manageMsg",
+              label: "留言管理",
+              icon: "liuyanguanli",
+              url: "/manageMsg",
+            },
+          ]
+        },
       ],
     };
   },
