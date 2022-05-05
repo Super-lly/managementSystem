@@ -11,7 +11,7 @@ axios.interceptors.response.use(res => {
 }, err => {
   // console.log(err);
 })
-const baseURL = 'http://47.112.187.95:8080'
+const baseURL = 'http://120.25.224.155:8080'
 export default {
   get:(url,data,token)=> new Promise((resolve, reject)=>{
     axios(baseURL+url,{
