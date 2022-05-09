@@ -325,9 +325,11 @@ export default {
     // 重置
     reset() {
       this.loading = true;
+      this.input = ''
       setTimeout(() => {
-        this.tableData = this.tabledata;
+        this.tableData = [];
         this.loading = false;
+        this.goodsInfo()
       }, 1500);
     },
     // 删除商品
