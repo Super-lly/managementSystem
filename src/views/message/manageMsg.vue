@@ -130,12 +130,11 @@ export default {
       this.loading = false
     },
     // 根据搜索内容进行查询
-    getSearch(pageNum) {
+    getSearch() {
       if (this.input != "") {
         this.loading = true
         let parmas = {
           nickname: this.input,
-          pageNum
         };
         request.post("/my/user/search/message", parmas, this.token).then((res) => {
           this.loading = false
