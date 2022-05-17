@@ -4,7 +4,7 @@
       <el-card shadow="hover" 
       style="height: 15vh; width: 35vw; min-width: 530px; min-height: 200px;margin-bottom:15px;cursor:pointer;border-radius: 25px;"
        v-for="(item, index) in goodsinfo" :key="index">
-        <div class="info">
+        <div class="info" v-if="item.goods_type != 'c'">
           <div class="goods_img">
             <img :src="item.goods_pic ? item.goods_pic : imgUrl" alt="goods_pic">
           </div>

@@ -221,8 +221,18 @@ export default {
     },
     // 提交编辑数据
     editCloseDrawer() {
-      console.log(this.form);
-      request.post('/goods/changeGoodsInfo',this.form,this.token)
+      // console.log(this.form);
+      let form = {
+        discount_price: this.form.discount_price,
+        goods_code: this.form.goods_code,
+        goods_describe: this.form.goods_describe,
+        goods_id: this.form.goods_id,
+        goods_name: this.form.goods_name,
+        goods_pic: this.goods_pic,
+        goods_price: this.form.goods_price,
+        goods_type: this.form.goods_type,
+      }
+      request.post('/goods/changeGoodsInfo',form,this.token)
       .then(res=>{
         if(res.status === 0){
           console.log(res);

@@ -26,16 +26,18 @@
         <el-table
           v-loading="loading"
           :data="tableData"
-          style="width: 80%"
-          max-height="400"
+          style="width: 90%"
+          max-height="450"
+          :header-cell-style="{textAlign: 'center'}"
+          :cell-style="{ textAlign: 'center' }"
         >
           <el-table-column fixed prop="username" label="用户名" width="200">
           </el-table-column>
-          <el-table-column prop="nickname" label="昵称" width="170">
+          <el-table-column prop="nickname" label="昵称" width="200">
           </el-table-column>
           <el-table-column prop="email" label="邮箱" width="200">
           </el-table-column>
-          <el-table-column prop="rootname" label="权限" width="150">
+          <el-table-column prop="rootname" label="权限" width="200">
             <template slot-scope="scope">
               <el-select v-model="scope.row.userroot" placeholder="请选择">
                 <el-option
@@ -49,7 +51,7 @@
             </template>
           </el-table-column>
           <!-- 操作 -->
-          <el-table-column fixed="right" label="操作" width="120">
+          <el-table-column fixed="right" label="操作" width="150">
             <template slot-scope="scope">
               <el-button
                 @click.native.prevent="
@@ -74,7 +76,7 @@
           </el-table-column>
         </el-table>
         <el-pagination
-          style="position: fixed; left:50%; bottom:10vh"
+          style="position: fixed; left:50%; bottom:8vh"
           layout="prev, pager, next"
           :page-size="10"
           @current-change="changePage"
@@ -205,7 +207,6 @@ export default {
           setTimeout(() => {
             this.loading = false;
           }, 1500);
-          console.log(this.tableData);
         }
       });
     },

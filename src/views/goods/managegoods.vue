@@ -26,7 +26,9 @@
           v-loading="loading"
           :data="tableData"
           style="width: 90%"
-          max-height="400"
+          max-height="450"
+          :header-cell-style="{textAlign: 'center'}"
+          :cell-style="{ textAlign: 'center' }"
         >
           <el-table-column fixed prop="goods_name" label="商品名称" width="200">
           </el-table-column>
@@ -69,7 +71,7 @@
         </el-table>
         <!-- 页码 -->
         <el-pagination
-          style="margin-left: 43%; margin-top: 15px"
+          style="position: fixed; left:50%; bottom:8vh"
           layout="prev, pager, next"
           :page-size="10"
           @current-change="changePage"
@@ -234,8 +236,10 @@ export default {
     // 获取商品信息
     goodsInfo() {
       const data = {};
+      this.loading = true
       request.get("/goods/goodsinfo", data, this.token).then((res) => {
         // console.log(res);
+        this.loading = false
         if (res.status === 0) {
           this.tableData = res.data.slice(0, 10);
           this.tableData.forEach(v=>{
