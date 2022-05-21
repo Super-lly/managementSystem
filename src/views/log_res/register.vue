@@ -1,6 +1,7 @@
 <template>
   <div class="register">
     <div class="user_card">
+      <h2 class="title">智能家居后台管理系统</h2>
       <!-- <form action="http:127.0.0.1/api/register" method="post"> -->
         <input type="text" name="username" placeholder="请输入用户名" v-model="username" />
         <input type="text" name="nickname" placeholder="请输入昵称" v-model="nickname" />
@@ -73,6 +74,9 @@ export default {
 </script>
 
 <style scoped>
+.title{
+  font-family: '楷体';
+}
 .register{
   height: 100%;
   background: url('../../assets/images/log&res.png') no-repeat center center fixed;

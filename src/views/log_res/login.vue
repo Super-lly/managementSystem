@@ -1,6 +1,7 @@
 <template>
   <div class="login">
     <div class="user_card">
+      <h2 class="title">智能家居后台管理系统</h2>
       <input type="text" name="username" placeholder="请输入用户名" v-model="username" />
       <input type="password" name="password" placeholder="请输入密码" v-model="password" />
       <button @click="login" class="login_btn" style="width:170px;height:30px">登录</button>
@@ -73,6 +74,9 @@ export default {
 </script>
 
 <style scoped>
+.title{
+  font-family: '楷体';
+}
 .login{
   height: 100%;
   background: url('../../assets/images/log&res.png') no-repeat center center fixed;
