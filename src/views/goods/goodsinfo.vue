@@ -1,7 +1,7 @@
 <template>
   <div class="goodsinfo">
     <div class="goods_cards">
-      <el-card shadow="hover" 
+      <el-card shadow="hover"  
       style="height: 15vh; width: 35vw; min-width: 530px; min-height: 200px;margin-bottom:15px;cursor:pointer;border-radius: 25px;"
        v-for="(item, index) in goodsinfo" :key="index">
         <div class="info" v-if="item.goods_type != 'c'">
@@ -16,6 +16,9 @@
               <span class="discount_price" style="margin-left:20px">折扣价：<span style="color:red">￥{{item.discount_price}}</span></span>
             </div>
           </div>
+        </div>
+        <div v-else>
+          <div style="min-height: 200px;height: 15vh;line-height: 15vh;text-align:center">该商品不予展示</div>
         </div>
       </el-card>
     </div>
@@ -80,6 +83,7 @@ export default {
   margin: 0;
   padding: 0;
   height: 200px;
+  max-width: 200px;
   overflow: hidden;
 }
 .goods_char .goods_name{
@@ -88,14 +92,14 @@ export default {
   text-align: center;
 }
 .goods_char .goods_describe{
-  width: 22vw;
+  width:20vw;
   height: 40%;
-  min-width: 335px;
-  padding: 0 0 15px 15px;
-  display: -webkit-box;
+  /* min-width: 335px; */
+  padding: 0 15px 15px 15px;
+  /* display: -webkit-box; */
   overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
+  /* -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1; */
 }
 .goods_char .goods_price,
 .goods_char .discount_price{
